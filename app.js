@@ -74,23 +74,25 @@ function getStoreEmployees() {
   return state.users.filter(u => u.storeId === sId && (u.role === 'staff' || u.role === 'admin'));
 }
 
-function getStoreInfo() {
-  const sId = getCurrentStoreId();
+function getStoreInfo(targetStoreId = null) {
+  const sId = targetStoreId || getCurrentStoreId();
   let found = null;
 
   if (Array.isArray(state.storeInfo) && state.storeInfo.length > 0) {
     found = state.storeInfo.find(info => info && info.storeId === sId);
-    if (!found && state.storeInfo.length === 1) {
+    if (!found && !targetStoreId && state.storeInfo.length === 1) {
       found = state.storeInfo[0];
     }
-    if (!found && state.currentUser && state.currentUser.storeName) {
+    if (!found && !targetStoreId && state.currentUser && state.currentUser.storeName) {
       found = state.storeInfo.find(info => info && info.name && info.name.toLowerCase() === state.currentUser.storeName.toLowerCase());
     }
   } else if (state.storeInfo && typeof state.storeInfo === 'object') {
-    found = state.storeInfo;
+    if (!targetStoreId || state.storeInfo.storeId === targetStoreId) {
+      found = state.storeInfo;
+    }
   }
 
-  const storeName = found?.name || state.currentUser?.storeName || 'SPA GIÀY';
+  const storeName = found?.name || (!targetStoreId ? state.currentUser?.storeName : '') || 'SPA GIÀY';
   let defaultPrefix = 'DH';
   const words = storeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().split(/\s+/);
   if (words.length >= 2) {
@@ -103,15 +105,105 @@ function getStoreInfo() {
     storeId: found?.storeId || sId,
     name: storeName,
     subtitle: found?.subtitle || 'SHOE SPA & REPAIR',
-    hotline: found?.hotline || state.currentUser?.phone || '0906 22 7512',
+    hotline: found?.hotline || (!targetStoreId ? state.currentUser?.phone : '') || '0906 22 7512',
     address: found?.address || '',
-    logoUrl: found?.logoUrl || '',
+    logoUrl: found?.logoUrl || found?.logo || '',
     orderPrefix: found?.orderPrefix || defaultPrefix,
     receiptNote: found?.receiptNote || 'Cảm ơn quý khách đã tin tưởng dịch vụ của chúng tôi!',
     fbPageId: found?.fbPageId || '',
     fbPageToken: found?.fbPageToken || ''
   };
 }
+
+async function getStoreInfoById(storeId) {
+  if (!storeId) return getStoreInfo();
+
+  if (Array.isArray(state.storeInfo) && state.storeInfo.length > 0) {
+    const found = state.storeInfo.find(info => info && info.storeId === storeId);
+    if (found) return getStoreInfo(storeId);
+  }
+
+  try {
+    const stored = localStorage.getItem('pb_v2_store_info');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const list = Array.isArray(parsed) ? parsed : [parsed];
+      const found = list.find(info => info && info.storeId === storeId);
+      if (found) {
+        if (!Array.isArray(state.storeInfo)) state.storeInfo = [];
+        if (!state.storeInfo.some(i => i && i.storeId === storeId)) {
+          state.storeInfo.push(found);
+        }
+        return getStoreInfo(storeId);
+      }
+    }
+  } catch (e) {
+    console.warn("Error parsing pb_v2_store_info from localStorage:", e);
+  }
+
+  if (window.db) {
+    try {
+      const doc = await window.db.collection('v2_store_info').doc(storeId).get();
+      if (doc.exists) {
+        const data = doc.data();
+        if (!Array.isArray(state.storeInfo)) state.storeInfo = [];
+        const idx = state.storeInfo.findIndex(i => i && i.storeId === storeId);
+        if (idx >= 0) state.storeInfo[idx] = data;
+        else state.storeInfo.push(data);
+        return getStoreInfo(storeId);
+      }
+    } catch (e) {
+      console.warn("Error fetching store info for tracking:", e);
+    }
+  }
+
+  return getStoreInfo(storeId);
+}
+
+async function findStoreByOrderPrefix(orderId) {
+  if (!orderId) return getStoreInfo();
+  let prefix = '';
+  if (orderId.includes('-')) {
+    prefix = orderId.split('-')[0].trim().toUpperCase();
+  } else {
+    const match = orderId.match(/^([A-Za-z]+)/);
+    if (match) prefix = match[1].toUpperCase();
+  }
+
+  if (!prefix) return getStoreInfo();
+
+  let stores = Array.isArray(state.storeInfo) ? state.storeInfo : [];
+  if (stores.length === 0) {
+    try {
+      const stored = localStorage.getItem('pb_v2_store_info');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        stores = Array.isArray(parsed) ? parsed : [parsed];
+      }
+    } catch (e) {}
+  }
+
+  let matched = stores.find(s => s && (s.orderPrefix || s.prefix || '').toUpperCase() === prefix);
+  if (!matched && window.db) {
+    try {
+      const snap = await window.db.collection('v2_store_info').get();
+      if (!snap.empty) {
+        snap.docs.forEach(doc => {
+          const d = doc.data();
+          if (d && (d.orderPrefix || d.prefix || '').toUpperCase() === prefix) {
+            matched = d;
+          }
+        });
+      }
+    } catch (e) {}
+  }
+
+  if (matched && matched.storeId) {
+    return getStoreInfo(matched.storeId);
+  }
+  return getStoreInfo();
+}
+
 
 function getStoreOrderPrefix(storeId = getCurrentStoreId()) {
   const info = getStoreInfo();
@@ -606,10 +698,24 @@ function updateStoreBrandingUI() {
   }
 
   // Public Tracking Page Header & Contacts
+  updatePublicTrackingStoreBranding(info);
+}
+
+function updatePublicTrackingStoreBranding(info) {
+  if (!info) info = getStoreInfo();
+
+  const storeName = info.name || 'SPA GIÀY';
+  const storeSubtitle = info.subtitle || 'SHOE SPA & REPAIR';
+  const storeLogo = info.logoUrl || info.logo || '';
+  const storeHotline = info.hotline || '0906 22 7512';
+  const storeAddress = info.address || 'N07C - LK19, Vạn Phúc, Hà Đông, Hà Nội';
+  const cleanHotline = storeHotline.replace(/\s+/g, '');
+
   const trackName = document.getElementById('track-brand-name');
   if (trackName) trackName.textContent = storeName;
   const trackSub = document.getElementById('track-brand-subtitle');
   if (trackSub) trackSub.textContent = storeSubtitle;
+
   const trackLogoContainer = document.getElementById('track-brand-logo-container');
   const trackLogoImg = document.getElementById('track-brand-logo-img');
   if (trackLogoContainer && trackLogoImg) {
@@ -624,7 +730,6 @@ function updateStoreBrandingUI() {
   const trackContactTitle = document.getElementById('track-brand-contact-title');
   if (trackContactTitle) trackContactTitle.textContent = `Cần hỗ trợ? Liên hệ ${storeName}:`;
 
-  const cleanHotline = storeHotline.replace(/\s+/g, '');
   const trackHotlineBtn = document.getElementById('track-brand-hotline-btn');
   if (trackHotlineBtn) trackHotlineBtn.href = `tel:${cleanHotline}`;
   const trackHotlineText = document.getElementById('track-brand-hotline-text');
@@ -2903,22 +3008,30 @@ async function loadPublicTracking(orderId) {
   }
   
   if (!order) {
-    displayTrackingError(orderId, "Không tìm thấy đơn hàng này trên hệ thống. Vui lòng kiểm tra lại mã đơn hàng hoặc liên hệ hotline để được hỗ trợ.");
+    await displayTrackingError(orderId, "Không tìm thấy đơn hàng này trên hệ thống. Vui lòng kiểm tra lại mã đơn hàng hoặc liên hệ hotline để được hỗ trợ.");
     return;
   }
   
-  renderTrackingInfo(order);
+  await renderTrackingInfo(order);
 }
 
-function displayTrackingError(orderId, message) {
+async function displayTrackingError(orderId, message) {
+  const storeInfo = await findStoreByOrderPrefix(orderId);
+  updatePublicTrackingStoreBranding(storeInfo);
+
   const card = document.querySelector('#view-public-tracking .tracking-card');
   if (!card) return;
   
+  const storeName = storeInfo.name || 'SPA GIÀY';
+  const storeSubtitle = storeInfo.subtitle || 'SHOE SPA & REPAIR';
+  const storeHotline = storeInfo.hotline || '0906 22 7512';
+  const cleanHotline = storeHotline.replace(/\s+/g, '');
+
   card.innerHTML = `
     <div class="tracking-header">
       <div class="brand-logo">
-        <h1>SPA GIÀY</h1>
-        <p>SHOE SPA & REPAIR</p>
+        <h1>${storeName}</h1>
+        <p>${storeSubtitle}</p>
       </div>
       <div class="tracking-title-block">
         <h2>TRA CỨU TIẾN ĐỘ ĐƠN HÀNG</h2>
@@ -2932,15 +3045,20 @@ function displayTrackingError(orderId, message) {
       </svg>
       <h3 style="color: var(--color-brand-brown-dark); margin-bottom: 8px; font-weight: 700;">Không tìm thấy thông tin</h3>
       <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">${message}</p>
-      <div style="display: flex; justify-content: center; gap: 12px;">
-        <a href="tel:0906227512" class="btn btn-primary">Gọi Hotline Hỗ Trợ</a>
-        <a href="https://zalo.me/0906227512" target="_blank" class="btn btn-secondary">Nhắn Zalo Shop</a>
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <a href="tel:${cleanHotline}" class="btn btn-primary">Gọi Hotline (${storeHotline})</a>
+        <a href="https://zalo.me/${cleanHotline}" target="_blank" class="btn btn-secondary">Nhắn Zalo Shop</a>
       </div>
     </div>
   `;
 }
 
-function renderTrackingInfo(order) {
+async function renderTrackingInfo(order) {
+  if (order && order.storeId) {
+    const storeInfo = await getStoreInfoById(order.storeId);
+    updatePublicTrackingStoreBranding(storeInfo);
+  }
+
   document.getElementById('track-order-id').textContent = order.id;
   document.getElementById('track-cust-name').textContent = order.customerName;
   
