@@ -397,7 +397,21 @@ function sanitizeAndMigrateMultiTenantData() {
   state.expenses.forEach(e => {
     if (!e.storeId) e.storeId = 'store_phuibui';
   });
-  saveState('pb_v2_expenses', state.expenses);
+
+  // Remove sample demo expenses (EXP-001, EXP-002, EXP-003)
+  const sampleExpenseIds = ['EXP-001', 'EXP-002', 'EXP-003'];
+  const hasSampleExpenses = state.expenses.some(e => sampleExpenseIds.includes(e.id));
+  if (hasSampleExpenses) {
+    state.expenses = state.expenses.filter(e => !sampleExpenseIds.includes(e.id));
+    saveState('pb_v2_expenses', state.expenses);
+    if (window.db) {
+      sampleExpenseIds.forEach(id => {
+        window.db.collection('v2_expenses').doc(id).delete().catch(() => {});
+      });
+    }
+  } else {
+    saveState('pb_v2_expenses', state.expenses);
+  }
 }
 
 function toggleMobileSidebar(forceState) {
