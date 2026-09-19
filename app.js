@@ -400,6 +400,23 @@ function sanitizeAndMigrateMultiTenantData() {
   saveState('pb_v2_expenses', state.expenses);
 }
 
+function toggleMobileSidebar(forceState) {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('mobile-sidebar-backdrop');
+  if (!sidebar) return;
+
+  const isOpen = sidebar.classList.contains('mobile-open');
+  const nextState = (typeof forceState === 'boolean') ? forceState : !isOpen;
+
+  if (nextState) {
+    sidebar.classList.add('mobile-open');
+    if (backdrop) backdrop.classList.add('active');
+  } else {
+    sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+  }
+}
+
 // 2. SPA ROUTER & NAVIGATION
 function switchView(viewId) {
   // Sync state.currentUser with latest in state.users if available
@@ -436,6 +453,9 @@ function switchView(viewId) {
 
   state.activeView = viewId;
 
+  // Close mobile sidebar drawer if open
+  toggleMobileSidebar(false);
+
   const workspace = document.getElementById('app-workspace');
   if (viewId === 'login' || viewId === 'subscription-pending' || viewId === 'public-tracking') {
     if (workspace) workspace.style.display = 'none';
@@ -464,6 +484,14 @@ function switchView(viewId) {
     li.classList.remove('active');
     if (li.getAttribute('data-view') === viewId) {
       li.classList.add('active');
+    }
+  });
+
+  // Update Mobile Bottom Nav active class
+  document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.getAttribute('data-view') === viewId) {
+      item.classList.add('active');
     }
   });
 
@@ -501,9 +529,11 @@ function updateStoreBrandingUI() {
 
   document.title = `${storeName} - Quản lý cửa hàng`;
 
-  // Sidebar Header
+  // Sidebar & Mobile Header
   const sidebarName = document.getElementById('sidebar-brand-name');
   if (sidebarName) sidebarName.textContent = storeName;
+  const mobileName = document.getElementById('mobile-brand-name');
+  if (mobileName) mobileName.textContent = storeName;
   const sidebarSub = document.getElementById('sidebar-brand-subtitle');
   if (sidebarSub) sidebarSub.textContent = storeSubtitle;
   const sidebarLogoContainer = document.getElementById('sidebar-brand-logo-container');
@@ -767,7 +797,10 @@ function updateProfileUI() {
     else if (state.currentUser.role === 'admin') roleText = 'Chủ Cửa Hàng';
     document.getElementById('profile-role').textContent = roleText;
 
-    document.getElementById('profile-initials').textContent = state.currentUser.name ? state.currentUser.name.split(' ').pop().substring(0, 2).toUpperCase() : 'US';
+    const initials = state.currentUser.name ? state.currentUser.name.split(' ').pop().substring(0, 2).toUpperCase() : 'US';
+    document.getElementById('profile-initials').textContent = initials;
+    const mobileInitials = document.getElementById('mobile-user-initials');
+    if (mobileInitials) mobileInitials.textContent = initials;
     
     // Hide/Show Menu Items by Role
     const isSuperAdmin = state.currentUser.role === 'superadmin';
