@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý cửa hàng Spa giày</title>
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================= AUTHENTICATION VIEW ================= -->
+  <div id="view-login" class="view-section login-container">
+    <div class="login-card">
+      <div id="login-brand-logo-container" style="display: none; margin-bottom: 12px; text-align: center;">
+        <img id="login-brand-logo-img" src="" alt="Logo" style="max-height: 60px; max-width: 100%; object-fit: contain;">
+      </div>
+      <h2 id="login-brand-name">SPA GIÀY</h2>
+      <p id="login-brand-subtitle">Hệ thống Quản lý & Kinh doanh Spa Giày</p>
+      
+      <!-- AUTH TABS SWITCHER -->
+      <div class="auth-tabs" style="display: flex; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: var(--radius-sm);">
+        <button type="button" class="auth-tab active" id="tab-login-btn" onclick="toggleAuthTab('login')" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: var(--bg-card); color: var(--color-brand-brown); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">ĐĂNG NHẬP</button>
+        <button type="button" class="auth-tab" id="tab-register-btn" onclick="toggleAuthTab('register')" style="flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--text-muted);">ĐĂNG KÝ MỚI</button>
+      </div>
+
+      <!-- FORM DANG NHAP -->
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Email đăng nhập</label>
+          <input type="email" id="login-email" class="form-control" placeholder="cuahang@shoespa.vn" required autocomplete="username">
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">Mật khẩu</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        
+        <div id="login-error-msg" style="color: var(--status-cancelled-text); font-size: 0.85rem; display: none; margin-bottom: 16px; font-weight: 600;"></div>
+        
+        <button type="submit" class="btn btn-primary w-full" style="height: 48px; border-radius: var(--radius-sm);">ĐĂNG NHẬP HỆ THỐNG</button>
+      </form>
+
+      <!-- FORM DANG KY CA THANG -->
+      <form id="register-form" style="display: none;">
+        <div class="form-group">
+          <label for="register-store-name">Tên cửa hàng Spa Giày *</label>
+          <input type="text" id="register-store-name" class="form-control" placeholder="Ví dụ: Sneaker Spa Hà Nội" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-owner-name">Họ và tên chủ cửa hàng *</label>
+          <input type="text" id="register-owner-name" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" required>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="register-email">Email đăng nhập *</label>
+            <input type="email" id="register-email" class="form-control" placeholder="admin@sneakerspa.vn" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="register-phone">Số điện thoại *</label>
+            <input type="tel" id="register-phone" class="form-control" placeholder="0901234567" required>
+          </div>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="register-password">Mật khẩu *</label>
+            <input type="password" id="register-password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label for="register-confirm-password">Nhập lại mật khẩu *</label>
+            <input type="password" id="register-confirm-password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="register-package">Gói dịch vụ mong muốn *</label>
+          <select id="register-package" class="form-control" required>
+            <option value="trial">Gói Dùng Thử 7 Ngày (0đ - Trải nghiệm)</option>
+            <option value="monthly">Gói Tiêu Chuẩn (199.000đ / tháng)</option>
+            <option value="yearly" selected>Gói Chuyên Nghiệp (1.990.000đ / năm - Tiết kiệm 17%)</option>
+            <option value="vip">Gói VIP Vĩnh Viễn (4.990.000đ - Trọn đời)</option>
+          </select>
+        </div>
+
+        <div id="register-msg" style="font-size: 0.85rem; display: none; margin-bottom: 16px; font-weight: 600; padding: 10px; border-radius: 6px;"></div>
+
+        <button type="submit" class="btn btn-primary w-full" style="height: 48px; border-radius: var(--radius-sm); background: #16a34a; border-color: #16a34a;">ĐĂNG KÝ TÀI KHOẢN CỬA HÀNG</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VIEW: SUBSCRIPTION PENDING / EXPIRED ================= -->
+  <div id="view-subscription-pending" class="view-section login-container" style="display: none;">
+    <div class="login-card" style="max-width: 520px; text-align: center; padding: 32px;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">⚠️</div>
+      <h2 id="pending-title" style="color: var(--color-brand-brown-dark); font-size: 1.4rem; margin-bottom: 8px;">TÀI KHOẢN CHỜ KÍCH HOẠT GÓI</h2>
+      <p id="pending-message" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+        Tài khoản của bạn đã được đăng ký thành công! Vui lòng liên hệ Admin hệ thống để kích hoạt gói dịch vụ và bắt đầu quản lý cửa hàng.
+      </p>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; text-align: left; font-size: 0.9rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Tên cửa hàng:</span>
+          <strong id="pending-store-name" style="color: var(--text-primary);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Chủ cửa hàng:</span>
+          <strong id="pending-owner-name" style="color: var(--text-primary);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Email đăng nhập:</span>
+          <strong id="pending-email" style="color: var(--text-primary);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Gói đã chọn:</span>
+          <strong id="pending-package-name" style="color: var(--color-brand-gold);">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Trạng thái hiện tại:</span>
+          <span id="pending-status-badge" style="padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; background: #fef3c7; color: #92400e;">Chờ duyệt</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-primary" onclick="checkUserActivationStatus()" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; background: #16a34a; border-color: #16a34a; font-weight: 700;">
+          🔄 Kiểm Tra Kích Hoạt & Vào Hệ Thống
+        </button>
+        <a href="https://zalo.me/0906227512" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; background: #0068ff; border-color: #0068ff;">
+          💬 Chat Zalo kích hoạt ngay (0906 22 7512)
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="handleLogout()" style="height: 44px;">Đăng xuất tài khoản</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= APP WORKSPACE VIEW ================= -->
+  <div id="app-workspace" class="app-container" style="display: none;">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div id="sidebar-brand-logo-container" style="display: none; margin-bottom: 8px;">
+          <img id="sidebar-brand-logo-img" src="" alt="Logo" style="max-height: 44px; max-width: 100%; object-fit: contain;">
+        </div>
+        <h1 id="sidebar-brand-name">SPA GIÀY</h1>
+        <p id="sidebar-brand-subtitle">SHOE SPA & REPAIR</p>
+      </div>
+      
+      <ul class="sidebar-menu">
+        <li data-view="dashboard" class="store-only admin-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Báo cáo thống kê
+          </a>
+        </li>
+        <li data-view="orders" class="store-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            Quản lý đơn hàng
+          </a>
+        </li>
+        <li data-view="expenses" class="store-only admin-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/></svg>
+            Quản lý chi phí
+          </a>
+        </li>
+        <li data-view="customers" class="store-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="currentColor"/></svg>
+            Quản lý khách hàng
+          </a>
+        </li>
+        <li data-view="services" class="store-only admin-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+            Cấu hình dịch vụ
+          </a>
+        </li>
+        <li data-view="employees" class="store-only admin-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7C15.12 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V19h11v-2.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V19h7v-2.25c0-.85.35-2.51 3-3.25-.97-.23-2.03-.25-3-.25z"/></svg>
+            Nhân viên
+          </a>
+        </li>
+        <li data-view="store-settings" class="store-only admin-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" fill="currentColor"/></svg>
+            Thông tin cửa hàng
+          </a>
+        </li>
+        <li data-view="content-studio" class="store-only">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 21l3.56-.63C9.37 20.73 10.64 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 14h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/></svg>
+            Marketing
+          </a>
+        </li>
+        <li data-view="saas-admin" class="superadmin-only" style="display: none;">
+          <a>
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L9 14.17l7.59-7.59L18 8l-9 9z" fill="currentColor"/></svg>
+            Quản lý Gói & SaaS
+          </a>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="user-profile" id="sidebar-profile">
+          <div class="user-avatar" id="profile-initials">AD</div>
+          <div class="user-info">
+            <span class="user-name" id="profile-name">Admin</span>
+            <span class="user-role" id="profile-role">Quản trị viên</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary w-full" onclick="handleLogout()" style="background-color: transparent; border-color: rgba(255,255,255,0.2); color: #FFFFFF; font-size: 0.85rem;">Đăng xuất</button>
+      </div>
+    </aside>
+    
+    <!-- MAIN WORKSPACE CONTENT -->
+    <main class="main-content">
+      
+      <!-- ================= VIEW: DASHBOARD ================= -->
+      <section id="view-dashboard" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Báo Cáo Doanh Thu</h2>
+            <p>Tổng quan chỉ số hoạt động kinh doanh của cửa hàng</p>
+          </div>
+        </div>
+
+        <!-- Dashboard Date Filters -->
+        <div class="filters-bar" style="margin-bottom: 24px; background-color: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(234, 223, 213, 0.5);">
+          <div style="font-weight: 700; color: var(--color-brand-brown);">Lọc dữ liệu thống kê:</div>
+          <div class="filter-controls" style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+            <input type="date" id="db-filter-date" class="filter-select" style="padding: 8px 12px;" title="Lọc theo ngày nhận">
+            
+            <select id="db-filter-month" class="filter-select" style="padding: 8px 12px;">
+              <option value="all">Tất cả các tháng</option>
+              <option value="1">Tháng 1</option>
+              <option value="2">Tháng 2</option>
+              <option value="3">Tháng 3</option>
+              <option value="4">Tháng 4</option>
+              <option value="5">Tháng 5</option>
+              <option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option>
+              <option value="8">Tháng 8</option>
+              <option value="9">Tháng 9</option>
+              <option value="10">Tháng 10</option>
+              <option value="11">Tháng 11</option>
+              <option value="12">Tháng 12</option>
+            </select>
+            
+            <select id="db-filter-year" class="filter-select" style="padding: 8px 12px;">
+              <option value="all">Tất cả các năm</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+            
+            <select id="db-filter-expense-mode" class="filter-select" style="padding: 8px 12px; font-weight: 600; color: var(--color-brand-brown-dark); border-color: var(--color-brand-gold);">
+              <option value="gross" selected>Doanh thu thực nhận: Chưa trừ chi phí</option>
+              <option value="net">Doanh thu thực nhận: Đã trừ chi phí</option>
+            </select>
+            
+            <button class="btn btn-secondary btn-sm" id="btn-reset-db-filters">Đặt lại</button>
+          </div>
+        </div>
+        
+        <!-- Metrics stats -->
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3>Tổng đơn nhận</h3>
+              <div class="stat-value" id="stat-total-orders">0</div>
+            </div>
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+          </div>
+          <div class="stat-card stat-processing">
+            <div class="stat-info">
+              <h3>Đang xử lý</h3>
+              <div class="stat-value" id="stat-active-orders">0</div>
+            </div>
+            <div class="stat-icon" style="background-color: var(--status-processing-bg);">
+              <svg viewBox="0 0 24 24" fill="var(--status-processing-text)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+          </div>
+          <div class="stat-card stat-completed">
+            <div class="stat-info">
+              <h3>Đã hoàn thành</h3>
+              <div class="stat-value" id="stat-completed-orders">0</div>
+            </div>
+            <div class="stat-icon" style="background-color: var(--status-completed-bg);">
+              <svg viewBox="0 0 24 24" fill="var(--status-completed-text)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+          </div>
+          <div class="stat-card stat-revenue-expected">
+            <div class="stat-info">
+              <h3>Doanh thu bán hàng (Gộp)</h3>
+              <div class="stat-value" id="stat-revenue-expected" style="font-size: 1.35rem; color: #3B82F6;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#3B82F6"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+          </div>
+          <div class="stat-card stat-total-expenses">
+            <div class="stat-info">
+              <h3>Tổng chi phí kinh doanh</h3>
+              <div class="stat-value" id="stat-total-expenses" style="font-size: 1.35rem; color: #EF4444;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(239, 68, 68, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#EF4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+          </div>
+          <div class="stat-card stat-revenue-realized">
+            <div class="stat-info">
+              <h3 id="lbl-stat-revenue-realized">Doanh thu thực nhận</h3>
+              <div class="stat-value" id="stat-revenue-realized" style="font-size: 1.35rem; color: var(--status-completed-text);">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: var(--status-completed-bg);">
+              <svg viewBox="0 0 24 24" fill="var(--status-completed-text)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.68v-1.92c-1.94-.28-3.57-1.49-3.73-3.48h2.09c.12.96.99 1.54 1.64 1.54.91 0 1.62-.51 1.62-1.39 0-1-.61-1.36-2.09-1.84-1.98-.64-3.58-1.47-3.58-3.69 0-1.82 1.39-3.13 3.32-3.44V4h2.68v1.9c1.62.24 3.01 1.34 3.26 3.19h-2.06c-.22-.84-.81-1.33-1.55-1.33-.86 0-1.42.49-1.42 1.15 0 .84.58 1.19 1.99 1.69 2.11.75 3.68 1.56 3.68 3.82 0 1.91-1.41 3.23-3.67 3.51z" fill="currentColor"/></svg>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Canvas charts grid -->
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <h3>Xu Hướng Doanh Thu</h3>
+              <div style="display: flex; gap: 12px; font-size: 0.8rem; font-weight: 600;">
+                <span style="color: #64748B;"><span style="display: inline-block; width: 12px; height: 2px; border-bottom: 2px dashed #94A3B8; margin-right: 4px; vertical-align: middle;"></span>Tạm tính</span>
+                <span style="color: #0284C7;"><span style="display: inline-block; width: 12px; height: 2px; background-color: #0284C7; margin-right: 4px; vertical-align: middle;"></span>Thực nhận</span>
+              </div>
+            </div>
+            <div class="canvas-container">
+              <canvas id="chart-revenue"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Dịch Vụ Sử Dụng Nhiều Nhất</h3>
+            </div>
+            <div class="canvas-container">
+              <canvas id="chart-services"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: ORDERS ================= -->
+      <section id="view-orders" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Quản Lý Đơn Hàng</h2>
+            <p>Tạo mới, theo dõi trạng thái vệ sinh và sửa chữa giày của khách</p>
+          </div>
+          <button class="btn btn-primary" onclick="openOrderModal()">
+            <svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#FFF"/></svg>
+            Thêm Đơn Hàng Mới
+          </button>
+        </div>
+
+        <div class="data-card">
+          <!-- Filter elements -->
+          <div class="filters-bar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" id="search-order" class="form-control" placeholder="Tìm tên khách, số điện thoại, mã đơn...">
+            </div>
+            
+            <div class="filter-controls" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <input type="date" id="filter-date" class="filter-select" title="Lọc theo ngày nhận">
+              
+              <select id="filter-month" class="filter-select">
+                <option value="all">Tất cả tháng</option>
+                <option value="1">Tháng 1</option>
+                <option value="2">Tháng 2</option>
+                <option value="3">Tháng 3</option>
+                <option value="4">Tháng 4</option>
+                <option value="5">Tháng 5</option>
+                <option value="6">Tháng 6</option>
+                <option value="7">Tháng 7</option>
+                <option value="8">Tháng 8</option>
+                <option value="9">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+              </select>
+              
+              <select id="filter-year" class="filter-select">
+                <option value="all">Tất cả năm</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+              </select>
+
+              <select id="filter-status" class="filter-select">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="processing">Đang tiến hành</option>
+                <option value="completed">Đã hoàn thành</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="delivered">Đã giao khách</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+
+              <button class="btn btn-secondary btn-sm" id="btn-reset-order-filters">Đặt lại</button>
+            </div>
+          </div>
+
+          <!-- Orders list table -->
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Thông tin giày & Dịch vụ</th>
+                  <th>Tổng tiền</th>
+                  <th>Ngày nhận</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Javascript will load this dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: CUSTOMERS ================= -->
+      <section id="view-customers" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Quản Lý Khách Hàng</h2>
+            <p>Danh sách khách hàng, lịch sử spa giày và thống kê chi tiêu</p>
+          </div>
+        </div>
+
+        <div class="data-card">
+          <!-- Filter elements -->
+          <div class="filters-bar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+              <input type="text" id="search-customer" class="form-control" placeholder="Tìm tên khách hàng, số điện thoại...">
+            </div>
+            <div class="filter-controls">
+              <button class="btn btn-secondary btn-sm" id="btn-reset-customer-filters">Đặt lại</button>
+            </div>
+          </div>
+
+          <!-- Customers list table -->
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Số lượng đơn</th>
+                  <th>Tổng chi tiêu</th>
+                  <th>Giao dịch gần nhất</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="customers-table-body">
+                <!-- Dynamically loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: SERVICES ================= -->
+      <section id="view-services" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Cấu Hình Dịch Vụ</h2>
+            <p>Quản lý danh mục các dịch vụ spa giày tại cửa hàng</p>
+          </div>
+          <button class="btn btn-primary" onclick="openServiceModal()">
+            <svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#FFF"/></svg>
+            Thêm Dịch Vụ Mới
+          </button>
+        </div>
+
+        <div class="service-list-grid" id="services-grid">
+          <!-- Javascript will load service cards dynamically -->
+        </div>
+      </section>
+
+      <!-- ================= VIEW: EMPLOYEES ================= -->
+      <section id="view-employees" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Danh Sách Nhân Viên</h2>
+            <p>Quản lý tài khoản truy cập và vai trò của nhân viên cửa hàng</p>
+          </div>
+          <button class="btn btn-primary" onclick="openEmployeeModal()">
+            <svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#FFF"/></svg>
+            Thêm Nhân Viên Mới
+          </button>
+        </div>
+
+        <div class="employee-grid" id="employees-grid">
+          <!-- Javascript will load employee cards dynamically -->
+        </div>
+      </section>
+
+      <!-- ================= VIEW: STORE SETTINGS ================= -->
+      <section id="view-store-settings" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Thông Tin & Cấu Hình Cửa Hàng</h2>
+            <p>Thay đổi tên thương hiệu, logo, hotline và địa chỉ hiển thị trên hóa đơn và trang tra cứu</p>
+          </div>
+        </div>
+
+        <div class="data-card" style="max-width: 800px; padding: 24px; margin-top: 16px;">
+          <form id="store-settings-form" onsubmit="handleStoreSettingsSubmit(event)">
+            
+            <!-- Logo Upload / URL Section -->
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label>Logo cửa hàng (Hiển thị trên Menu, Hóa đơn & Tra cứu)</label>
+              <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px; flex-wrap: wrap;">
+                <div id="store-logo-preview" style="width: 90px; height: 90px; border-radius: var(--radius-md); background: rgba(0,0,0,0.05); border: 2px dashed var(--color-brand-gold); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+                  <span style="font-size: 0.75rem; color: #888; text-align: center; padding: 4px;">Chưa có logo</span>
+                </div>
+                <div style="flex: 1; min-width: 250px;">
+                  <div style="margin-bottom: 8px;">
+                    <label style="font-size: 0.8rem; font-weight: 500;">Chọn tệp logo từ máy:</label>
+                    <input type="file" id="store-logo-file" accept="image/*" class="form-control" onchange="handleStoreLogoSelect(event)">
+                  </div>
+                  <div>
+                    <label style="font-size: 0.8rem; font-weight: 500;">Hoặc dán link ảnh Logo (URL):</label>
+                    <input type="text" id="store-logo-url" class="form-control" placeholder="https://example.com/logo.png" oninput="updateStoreLogoPreviewFromInput()">
+                  </div>
+                  <small style="color: var(--text-secondary); display: block; margin-top: 6px;">Hỗ trợ định dạng PNG, JPG, WebP hoặc SVG. Ảnh sẽ được tự động nén nhỏ gọn.</small>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="store-name-input">Tên thương hiệu / Cửa hàng *</label>
+                <input type="text" id="store-name-input" class="form-control" required placeholder="Ví dụ: SPA GIÀY PHỦI BỤI" oninput="livePreviewStoreBranding()">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="store-subtitle-input">Slogan / Phụ đề *</label>
+                <input type="text" id="store-subtitle-input" class="form-control" required placeholder="Ví dụ: SHOE SPA & REPAIR" oninput="livePreviewStoreBranding()">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="store-hotline-input">Hotline / Số điện thoại *</label>
+                <input type="text" id="store-hotline-input" class="form-control" required placeholder="Ví dụ: 0906 22 7512" oninput="livePreviewStoreBranding()">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="store-address-input">Địa chỉ cửa hàng *</label>
+                <input type="text" id="store-address-input" class="form-control" required placeholder="Ví dụ: N07C - LK19, Vạn Phúc, Hà Đông, Hà Nội" oninput="livePreviewStoreBranding()">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label for="store-order-prefix-input">Tiền tố mã đơn hàng của shop (Order Prefix) *</label>
+              <input type="text" id="store-order-prefix-input" class="form-control" required placeholder="Ví dụ: XG (Xưởng Giày), PB (Phủi Bụi), SC (Sneaker Care)..." style="font-weight: 700; text-transform: uppercase;">
+              <small style="color: var(--text-secondary); display: block; margin-top: 4px;">
+                💡 Mã đơn của shop sẽ tự động đánh số theo tiền tố này (Ví dụ: <b>XG-1001</b>, <b>XG-1002</b>...). Giúp mã đơn của các cửa hàng độc lập & không bị lẫn lộn trên hệ thống.
+              </small>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label for="store-receipt-note-input">Ghi chú chân hóa đơn in</label>
+              <textarea id="store-receipt-note-input" class="form-control" rows="3" placeholder="Lời cảm ơn hoặc lưu ý in ở cuối hóa đơn..."></textarea>
+            </div>
+
+            <!-- Facebook Fanpage Auto-Post Integration Settings -->
+            <div style="background: var(--color-brand-cream); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 24px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--color-brand-brown-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: #1877F2;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Cấu hình Đăng bài Tự Động lên Facebook Fanpage (Meta Graph API)
+              </h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="store-fb-page-id">Facebook Page ID (ID Trang Fanpage)</label>
+                  <input type="text" id="store-fb-page-id" class="form-control" placeholder="Ví dụ: 102938475638291">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label for="store-fb-page-token">Page Access Token (Mã truy cập Page)</label>
+                  <input type="password" id="store-fb-page-token" class="form-control" placeholder="EAAxxxxxxx... (Dán Token truy cập tại đây)">
+                </div>
+              </div>
+              <small style="color: var(--text-secondary); display: block; margin-top: 8px;">
+                💡 <b>Hướng dẫn lấy Token:</b> Vào <a href="https://developers.facebook.com/" target="_blank" style="color: var(--color-brand-gold); text-decoration: underline;">developers.facebook.com</a> &gt; Graph API Explorer &gt; Chọn Fanpage của bạn &gt; Cấp quyền <code>pages_manage_posts</code> &gt; Copy Page Access Token.
+              </small>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-weight: 700;">
+                💾 LƯU CẤU HÌNH CỬA HÀNG
+              </button>
+              <span id="store-settings-msg" style="color: var(--status-completed-text); font-weight: 600; display: none;">✓ Đã lưu cấu hình cửa hàng thành công!</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: CONTENT STUDIO ================= -->
+      <section id="view-content-studio" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Marketing & Sáng Tạo Content</h2>
+            <p>Tạo bài viết và thiết kế ảnh quảng cáo chuyên nghiệp đăng Facebook, Zalo, Instagram từ đơn hàng hoặc ảnh tự chọn</p>
+          </div>
+        </div>
+
+        <div class="content-studio-container">
+          <!-- LEFT COLUMN: INPUTS & TEXT GENERATOR -->
+          <div class="studio-col input-text-col">
+            <div class="data-card studio-card">
+              <h3 class="studio-card-title">
+                <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--color-brand-gold);"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                1. Nguồn Dữ Liệu & Thông Tin
+              </h3>
+
+              <!-- Source Toggle Tabs -->
+              <div class="source-toggle-group">
+                <button type="button" class="source-tab-btn active" id="tab-src-order" onclick="switchContentSource('order')">📦 Từ đơn hàng có sẵn</button>
+                <button type="button" class="source-tab-btn" id="tab-src-custom" onclick="switchContentSource('custom')">🖼️ Tự chọn ảnh & Nhập thủ công</button>
+              </div>
+
+              <!-- Section: Order Selector -->
+              <div id="studio-src-order-block" class="studio-src-block">
+                <div class="form-group">
+                  <label for="studio-order-select">Chọn đơn hàng *</label>
+                  <select id="studio-order-select" class="form-control" onchange="onStudioOrderSelect(this.value)">
+                    <option value="">-- Chọn một đơn hàng --</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Section: Custom Image Upload (2 Slots: BEFORE & AFTER) -->
+              <div id="studio-src-custom-block" class="studio-src-block" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                  
+                  <!-- Slot 1: Ảnh TRƯỚC khi giặt (BEFORE) -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-weight: 700; color: #DC2626; display: flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+                      📸 1. Ảnh TRƯỚC khi giặt (BEFORE)
+                    </label>
+                    <div class="image-upload-wrapper" id="studio-before-upload-box" onclick="document.getElementById('studio-before-image-input').click()" style="min-height: 130px; padding: 8px;">
+                      <div id="studio-before-preview-box" style="text-align: center; width: 100%;">
+                        <svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:#DC2626;margin-bottom:4px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <p style="font-size: 0.8rem; margin: 0; font-weight: 600; color: var(--text-secondary);">Bấm chọn ảnh TRƯỚC giặt</p>
+                      </div>
+                    </div>
+                    <input type="file" id="studio-before-image-input" accept="image/*" style="display: none;" onchange="handleStudioBeforeImage(event)">
+                  </div>
+
+                  <!-- Slot 2: Ảnh SAU khi giặt (AFTER) -->
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-weight: 700; color: #16A34A; display: flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+                      ✨ 2. Ảnh SAU khi giặt (AFTER)
+                    </label>
+                    <div class="image-upload-wrapper" id="studio-after-upload-box" onclick="document.getElementById('studio-after-image-input').click()" style="min-height: 130px; padding: 8px;">
+                      <div id="studio-after-preview-box" style="text-align: center; width: 100%;">
+                        <svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:#16A34A;margin-bottom:4px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        <p style="font-size: 0.8rem; margin: 0; font-weight: 600; color: var(--text-secondary);">Bấm chọn ảnh SAU giặt</p>
+                      </div>
+                    </div>
+                    <input type="file" id="studio-after-image-input" accept="image/*" style="display: none;" onchange="handleStudioAfterImage(event)">
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Section: Custom Single Promo Image Upload -->
+              <div id="studio-src-promo-block" class="studio-src-block" style="display: none;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label style="font-weight: 700; color: #EAB308; display: flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+                    🔥 Tải 1 Ảnh Sản Phẩm / Banner Khuyến Mãi
+                  </label>
+                  <div class="image-upload-wrapper" id="studio-promo-upload-box" onclick="document.getElementById('studio-promo-image-input').click()" style="min-height: 130px; padding: 8px;">
+                    <div id="studio-promo-preview-box" style="text-align: center; width: 100%;">
+                      <svg viewBox="0 0 24 24" style="width:36px;height:36px;fill:#EAB308;margin-bottom:4px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                      <p style="font-size: 0.8rem; margin: 0; font-weight: 600; color: var(--text-secondary);">Bấm để chọn 1 ảnh sản phẩm / Banner khuyến mãi</p>
+                    </div>
+                  </div>
+                  <input type="file" id="studio-promo-image-input" accept="image/*" style="display: none;" onchange="handleStudioPromoImage(event)">
+                </div>
+              </div>
+
+              <!-- Image Thumbnails Grid -->
+              <div class="form-group">
+                <label>Ảnh sử dụng tạo bài viết & canvas</label>
+                <div class="image-preview-grid" id="studio-images-preview">
+                  <div style="color: var(--text-light); font-size: 0.85rem; font-style: italic;">Chưa có ảnh nào được chọn.</div>
+                </div>
+              </div>
+
+              <!-- Container: Quick Tips Preset Buttons (Shown in Tips mode) -->
+              <div id="studio-quick-tips-container" style="display: none; background: rgba(245, 158, 11, 0.08); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(245, 158, 11, 0.3); margin-bottom: 16px;">
+                <label style="font-weight: 700; color: #F59E0B; display: flex; align-items: center; gap: 4px; font-size: 0.85rem; margin-bottom: 8px;">
+                  💡 Bấm chọn 1 Mẹo Vặt Mẫu (Tự động sinh toàn bộ Nội dung & Ảnh Infographic):
+                </label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="preset-pill active" onclick="applyQuickShoeTip('yellow_sole', this)">🍋 Tẩy ố vàng đế</button>
+                  <button type="button" class="preset-pill" onclick="applyQuickShoeTip('odor_remove', this)">🍃 Khử mùi hôi cấp tốc</button>
+                  <button type="button" class="preset-pill" onclick="applyQuickShoeTip('suede_care', this)">🧼 Vệ sinh da lộn (Suede)</button>
+                  <button type="button" class="preset-pill" onclick="applyQuickShoeTip('rain_waterproof', this)">☔ Xử lý giày ướt mưa</button>
+                  <button type="button" class="preset-pill" onclick="applyQuickShoeTip('scuff_mark', this)">⚪ Tẩy vết xước da trắng</button>
+                </div>
+              </div>
+
+              <!-- Shoe & Service details inputs -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label id="lbl-studio-shoe-info" for="studio-shoe-info">Tên / Hiệu / Model Giày</label>
+                  <input type="text" id="studio-shoe-info" class="form-control" placeholder="Ví dụ: Nike Air Jordan 1 High" oninput="generateFanpageCaption(); renderContentCanvas();">
+                </div>
+                <div class="form-group">
+                  <label id="lbl-studio-customer-name" for="studio-customer-name">Tên khách hàng (Tùy chọn)</label>
+                  <input type="text" id="studio-customer-name" class="form-control" placeholder="Ví dụ: Anh Tuấn" oninput="generateFanpageCaption(); renderContentCanvas();">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label id="lbl-studio-services-text" for="studio-services-text">Dịch vụ thực hiện</label>
+                  <input type="text" id="studio-services-text" class="form-control" placeholder="Ví dụ: Vệ sinh chuyên sâu + Repaint đế" oninput="generateFanpageCaption(); renderContentCanvas();">
+                </div>
+                <div class="form-group">
+                  <label id="lbl-studio-price-text" for="studio-price-text">Tổng chi phí / Giá dịch vụ</label>
+                  <input type="text" id="studio-price-text" class="form-control" placeholder="Ví dụ: 250.000đ" oninput="generateFanpageCaption(); renderContentCanvas();">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label id="lbl-studio-notes-text" for="studio-notes-text">Ghi chú tình trạng / Điểm nổi bật</label>
+                <input type="text" id="studio-notes-text" class="form-control" placeholder="Ví dụ: Ố vàng lâu năm đã được tẩy trắng sáng như mới" oninput="generateFanpageCaption(); renderContentCanvas();">
+              </div>
+
+              <!-- Suggestion Presets & Tone Selection -->
+              <h3 class="studio-card-title" style="margin-top: 24px;">
+                <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--color-brand-gold);"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+                2. Gợi Ý Mẫu Bài Viết & Giọng Văn
+              </h3>
+
+              <div class="form-group">
+                <label>Chọn gợi ý chủ đề bài viết (Preset Template)</label>
+                <div class="preset-pill-group">
+                  <button type="button" class="preset-pill active" data-preset="before_after" onclick="selectPresetTemplate(this)">✨ Before & After (Khoe thành quả)</button>
+                  <button type="button" class="preset-pill" data-preset="tips" onclick="selectPresetTemplate(this)">💡 Mẹo vặt & Bảo quản giày</button>
+                  <button type="button" class="preset-pill" data-preset="feedback" onclick="selectPresetTemplate(this)">💬 Feedback & Cảm ơn khách hàng</button>
+                  <button type="button" class="preset-pill" data-preset="promotion" onclick="selectPresetTemplate(this)">🔥 Khuyến mãi & Tri ân</button>
+                  <button type="button" class="preset-pill" data-preset="story" onclick="selectPresetTemplate(this)">🛠️ Kể chuyện quy trình Spa tỉ mỉ</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Chọn phong cách / Giọng văn (Tone)</label>
+                <div class="tone-button-group">
+                  <button type="button" class="tone-btn active" data-tone="friendly" onclick="selectTone(this)">😊 Thân thiện & Năng động</button>
+                  <button type="button" class="tone-btn" data-tone="professional" onclick="selectTone(this)">💼 Chuyên nghiệp & Đáng tin</button>
+                  <button type="button" class="tone-btn" data-tone="viral" onclick="selectTone(this)">🚀 Giật gân & Thu hút (Viral)</button>
+                  <button type="button" class="tone-btn" data-tone="luxury" onclick="selectTone(this)">✨ Sang trọng (Premium)</button>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary w-full" style="padding: 12px; font-weight: 700; font-size: 1rem;" onclick="generateFanpageCaption()">
+                ✨ TẠO BÀI VIẾT FANPAGE NGAY
+              </button>
+
+              <!-- Output Caption Result -->
+              <div class="form-group" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label for="studio-caption-output" style="margin: 0;">Nội dung bài viết Fanpage tạo ra:</label>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="copyStudioCaption()">📋 Sao chép bài viết</button>
+                </div>
+                <textarea id="studio-caption-output" class="form-control" rows="12" style="font-family: inherit; font-size: 0.9rem; line-height: 1.5;" placeholder="Bấm nút trên để tạo bài viết tự động..."></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: GRAPHIC IMAGE CANVAS GENERATOR -->
+          <div class="studio-col image-canvas-col">
+            <div class="data-card studio-card">
+              <h3 class="studio-card-title">
+                <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--color-brand-gold);"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                3. Thiết Kế Ảnh Content Fanpage (Graphic Canvas)
+              </h3>
+
+              <!-- Graphic Template Selector -->
+              <div class="form-group">
+                <label>Gợi ý Mẫu Thiết Kế Ảnh (Graphic Templates)</label>
+                <div class="graphic-template-grid">
+                  <div class="graphic-tpl-card active" data-tpl="before_after_split" onclick="selectGraphicTemplate(this)">
+                    <div class="tpl-preview-box tpl-before-after-box">
+                      <span>BEFORE</span>
+                      <span>AFTER</span>
+                    </div>
+                    <div class="tpl-title">Mẫu 1: Before & After</div>
+                  </div>
+                  <div class="graphic-tpl-card" data-tpl="showcase_badge" onclick="selectGraphicTemplate(this)">
+                    <div class="tpl-preview-box tpl-showcase-box" style="background: linear-gradient(135deg, #1E293B, #0F172A); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                      <span style="font-size: 0.7rem; font-weight: 700; color: #F59E0B;">💡 MẸO VẶT GIÀY</span>
+                      <span style="font-size: 0.65rem; color: #94A3B8;">[Ảnh Giày + Ý Chính]</span>
+                    </div>
+                    <div class="tpl-title">Mẫu 2: Mẹo Vặt Vệ Sinh Giày</div>
+                  </div>
+                  <div class="graphic-tpl-card" data-tpl="customer_feedback" onclick="selectGraphicTemplate(this)">
+                    <div class="tpl-preview-box tpl-feedback-box">
+                      <span>★★★★★</span>
+                      <span>FEEDBACK</span>
+                    </div>
+                    <div class="tpl-title">Mẫu 3: Feedback Khách</div>
+                  </div>
+                  <div class="graphic-tpl-card" data-tpl="promo_banner" onclick="selectGraphicTemplate(this)">
+                    <div class="tpl-preview-box tpl-promo-box">
+                      <span>SALE OFF</span>
+                      <span>DỊCH VỤ</span>
+                    </div>
+                    <div class="tpl-title">Mẫu 4: Banner Quảng Cáo</div>
+                  </div>
+                  <div class="graphic-tpl-card" data-tpl="simple_framed" onclick="selectGraphicTemplate(this)">
+                    <div class="tpl-preview-box tpl-framed-box">
+                      <span style="font-size: 0.7rem; font-weight: 700; color: #F59E0B;">🖼️ KHUNG BRAND</span>
+                      <span style="font-size: 0.65rem; color: #94A3B8;">[Ảnh + Logo & LH]</span>
+                    </div>
+                    <div class="tpl-title">Mẫu 5: Khung Ảnh Logo & Thông Tin</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Color / Style Options -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label for="canvas-theme-select">Tông màu chủ đạo</label>
+                  <select id="canvas-theme-select" class="form-control" onchange="renderContentCanvas()">
+                    <option value="brand_dark">Nâu Đen Sang Trọng (Brand Gold)</option>
+                    <option value="brand_cream">Kem Ấm Nóng (Brand Cream)</option>
+                    <option value="midnight">Đen Neon Midnight</option>
+                    <option value="emerald">Xanh Ngọc Emerald</option>
+                    <option value="sunset">Cam Hồng Sunset</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="canvas-badge-input">Nội dung Tem Nhãn (Badge)</label>
+                  <input type="text" id="canvas-badge-input" class="form-control" value="SPA GIÀY CAO CẤP" oninput="renderContentCanvas()">
+                </div>
+              </div>
+
+              <!-- Toggles -->
+              <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+                <label style="font-weight: 500; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                  <input type="checkbox" id="canvas-show-logo" checked onchange="renderContentCanvas()"> Hiện Logo Cửa Hàng
+                </label>
+                <label style="font-weight: 500; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                  <input type="checkbox" id="canvas-show-hotline" checked onchange="renderContentCanvas()"> Hiện Hotline & Địa chỉ
+                </label>
+                <label style="font-weight: 500; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                  <input type="checkbox" id="canvas-show-price" checked onchange="renderContentCanvas()"> Hiện Khung Giá
+                </label>
+              </div>
+
+              <!-- Live Canvas Preview Box -->
+              <div class="canvas-preview-wrapper">
+                <canvas id="content-studio-canvas" width="1080" height="1080"></canvas>
+              </div>
+
+              <!-- Canvas Action Buttons -->
+              <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" style="flex: 1; padding: 12px; font-weight: 700;" onclick="downloadStudioCanvasImage()">
+                  📥 TẢI ÁNH HD VỀ MÁY (PNG)
+                </button>
+                <button type="button" class="btn btn-secondary" style="padding: 12px 16px; font-weight: 600;" onclick="copyStudioCanvasImage()">
+                  🖼️ SAO CHÉP ÁNH
+                </button>
+                <button type="button" id="btn-publish-fb" class="btn btn-facebook" style="width: 100%; margin-top: 8px; padding: 14px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="publishToFacebookFanpage()">
+                  <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #FFFFFF;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  🚀 ĐĂNG TỰ ĐỘNG LÊN FANPAGE FACEBOOK
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: EXPENSES MANAGEMENT ================= -->
+      <section id="view-expenses" class="view-section">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Quản Lý Chi Phí Kinh Doanh</h2>
+            <p>Theo dõi các khoản chi phí phát sinh hàng tháng & khấu trừ vào lợi nhuận ròng</p>
+          </div>
+          <button class="btn btn-primary" onclick="openExpenseModal()">
+            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #FFFFFF;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Thêm khoản chi mới
+          </button>
+        </div>
+
+        <!-- Expenses Summary Cards -->
+        <div class="dashboard-stats" style="margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3>Tổng chi phí lọc</h3>
+              <div class="stat-value" id="exp-stat-total" style="font-size: 1.35rem; color: #EF4444;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(239, 68, 68, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#EF4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3>Mặt bằng & Điện nước</h3>
+              <div class="stat-value" id="exp-stat-rent-utilities" style="font-size: 1.35rem;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(245, 158, 11, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3>Lương nhân viên & Phụ cấp</h3>
+              <div class="stat-value" id="exp-stat-salaries" style="font-size: 1.35rem;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(59, 130, 246, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#3B82F6"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <h3>Hóa chất, Vật tư & Khác</h3>
+              <div class="stat-value" id="exp-stat-supplies-other" style="font-size: 1.35rem;">0đ</div>
+            </div>
+            <div class="stat-icon" style="background-color: rgba(16, 185, 129, 0.15);">
+              <svg viewBox="0 0 24 24" fill="#10B981"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar" style="margin-bottom: 24px; background-color: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(234, 223, 213, 0.5); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="font-weight: 700; color: var(--color-brand-brown);">Bộ lọc chi phí:</div>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <select id="exp-filter-month" class="filter-select" onchange="renderExpenses()">
+              <option value="all">Tất cả các tháng</option>
+              <option value="1">Tháng 1</option>
+              <option value="2">Tháng 2</option>
+              <option value="3">Tháng 3</option>
+              <option value="4">Tháng 4</option>
+              <option value="5">Tháng 5</option>
+              <option value="6">Tháng 6</option>
+              <option value="7">Tháng 7</option>
+              <option value="8">Tháng 8</option>
+              <option value="9">Tháng 9</option>
+              <option value="10">Tháng 10</option>
+              <option value="11">Tháng 11</option>
+              <option value="12">Tháng 12</option>
+            </select>
+
+            <select id="exp-filter-year" class="filter-select" onchange="renderExpenses()">
+              <option value="all">Tất cả các năm</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+            </select>
+
+            <select id="exp-filter-category" class="filter-select" onchange="renderExpenses()">
+              <option value="all">Tất cả danh mục</option>
+              <option value="rent">Mặt bằng / Cửa hàng</option>
+              <option value="salaries">Lương nhân viên & Phụ cấp</option>
+              <option value="supplies">Dung dịch, Hóa chất & Vật tư Spa</option>
+              <option value="utilities">Điện, Nước & Internet</option>
+              <option value="marketing">Quảng cáo & Marketing</option>
+              <option value="other">Chi phí khác</option>
+            </select>
+
+            <button type="button" class="btn btn-secondary btn-sm" onclick="resetExpenseFilters()">Đặt lại</button>
+          </div>
+        </div>
+
+        <!-- Expense Table Card -->
+        <div class="data-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã khoản chi</th>
+                  <th>Ngày chi</th>
+                  <th>Danh mục</th>
+                  <th>Nội dung chi / Lý do</th>
+                  <th>Số tiền chi</th>
+                  <th>Người tạo</th>
+                  <th style="text-align: right;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="expenses-table-body">
+                <!-- Expenses rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= VIEW: SAAS SUPER ADMIN ================= -->
+      <section id="view-saas-admin" class="view-section" style="display: none;">
+        <div class="top-bar">
+          <div class="page-title">
+            <h2>Quản Lý Gói & Báo Cáo Tổng SaaS</h2>
+            <p>Báo cáo doanh thu tổng các cửa hàng, thống kê phần mềm & quản lý kích hoạt gói cước</p>
+          </div>
+        </div>
+
+        <!-- SUPER ADMIN EXECUTIVE STATS CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          
+          <div class="stat-card" style="background: linear-gradient(135deg, #0F172A, #1E293B); color: #FFF; padding: 20px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.82rem; font-weight: 600; color: #94A3B8; margin-bottom: 6px;">🏪 TỔNG CỬA HÀNG ĐÃ ĐĂNG KÝ</div>
+            <div id="saas-stat-total-stores" style="font-size: 1.8rem; font-weight: 800; color: #38BDF8;">0</div>
+            <div style="font-size: 0.75rem; color: #CBD5E1; margin-top: 4px;">
+              <span id="saas-stat-active-stores" style="color: #4ADE80; font-weight: 700;">0 Đang dùng</span> • 
+              <span id="saas-stat-pending-stores" style="color: #FBBF24; font-weight: 700;">0 Chờ kích hoạt</span>
+            </div>
+          </div>
+
+          <div class="stat-card" style="background: #FFFFFF; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">💰 TỔNG DOANH THU TẤT CẢ CỬA HÀNG</div>
+            <div id="saas-stat-total-gmv" style="font-size: 1.5rem; font-weight: 800; color: var(--color-brand-gold);">0 đ</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;">Tổng phát sinh đơn hàng từ tất cả chi nhánh</div>
+          </div>
+
+          <div class="stat-card" style="background: #FFFFFF; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">📦 TỔNG ĐƠN HÀNG TOÀN HỆ THỐNG</div>
+            <div id="saas-stat-total-orders" style="font-size: 1.5rem; font-weight: 800; color: var(--color-brand-brown-dark);">0</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;">Số lượng giao dịch dịch vụ ghi nhận</div>
+          </div>
+
+          <div class="stat-card" style="background: #FFFFFF; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">💎 DOANH THU BÁN GÓI SAAS</div>
+            <div id="saas-stat-total-sub-revenue" style="font-size: 1.5rem; font-weight: 800; color: #16A34A;">0 đ</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;">Doanh thu thu từ các gói phần mềm cửa hàng</div>
+          </div>
+
+        </div>
+
+        <div class="card" style="background: var(--bg-card); padding: 20px; border-radius: var(--radius-md); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 12px; align-items: center; flex: 1; min-width: 280px;">
+              <input type="text" id="saas-search" class="form-control" placeholder="🔍 Tìm theo tên cửa hàng, email, SĐT..." onkeyup="renderSaasAdminView()">
+              <select id="saas-filter-status" class="form-control" style="width: 200px;" onchange="renderSaasAdminView()">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chờ kích hoạt</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="expired">Đã hết hạn</option>
+                <option value="locked">Tạm khóa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tên Cửa Hàng / Chủ CH</th>
+                  <th>Email & SĐT</th>
+                  <th>Gói Đăng Ký</th>
+                  <th>Trạng Thái Gói</th>
+                  <th>Ngày Hết Hạn</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="saas-users-table-body">
+                <!-- JS dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODAL: ACTIVATE / EXTEND SAAS PACKAGE ================= -->
+  <div class="modal-overlay" id="modal-activate-package" style="display: none;">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3>Kích Hoạt / Gia Hạn Gói Dịch Vụ</h3>
+        <button class="close-modal-btn" onclick="closeActivatePackageModal()">&times;</button>
+      </div>
+      <form id="activate-package-form" onsubmit="handleActivatePackageSubmit(event)">
+        <input type="hidden" id="activate-user-id">
+        <div class="modal-body">
+          <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 0.9rem;">
+            <div>Cửa hàng: <strong id="act-modal-store-name">--</strong></div>
+            <div>Email: <strong id="act-modal-email">--</strong></div>
+          </div>
+
+          <div class="form-group">
+            <label for="act-package-select">Chọn gói cước dịch vụ *</label>
+            <select id="act-package-select" class="form-control" required onchange="updateActivatePackageDuration()">
+              <option value="trial">Gói Dùng Thử (7 ngày)</option>
+              <option value="monthly">Gói Tiêu Chuẩn (1 tháng / 30 ngày)</option>
+              <option value="yearly" selected>Gói Chuyên Nghiệp (1 năm / 365 ngày)</option>
+              <option value="vip">Gói VIP Vĩnh Viễn</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="act-expires-date">Ngày hết hạn *</label>
+            <input type="date" id="act-expires-date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="act-status-select">Trạng thái tài khoản *</label>
+            <select id="act-status-select" class="form-control" required>
+              <option value="active">Đang hoạt động (Kích hoạt)</option>
+              <option value="pending">Chờ kích hoạt</option>
+              <option value="expired">Hết hạn gói</option>
+              <option value="locked">Tạm khóa tài khoản</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeActivatePackageModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary" style="background: #16a34a; border-color: #16a34a;">LƯU KÍCH HOẠT</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE / EDIT ORDER ================= -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="order-modal-title">Thêm Đơn Hàng Mới</h3>
+        <button class="close-modal-btn" onclick="closeOrderModal()">&times;</button>
+      </div>
+      <form id="order-form" onsubmit="handleOrderSubmit(event)">
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="order-id-input">Mã đơn hàng *</label>
+              <input type="text" id="order-id-input" class="form-control" required style="font-weight: 700; color: var(--color-brand-brown-dark);" placeholder="Ví dụ: XG-1001">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="order-cust-name">Tên khách hàng *</label>
+              <input type="text" id="order-cust-name" class="form-control" required placeholder="Ví dụ: Nguyễn Văn A">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="order-cust-phone">Số điện thoại khách hàng *</label>
+            <input type="text" id="order-cust-phone" class="form-control" required placeholder="Ví dụ: 0912345678">
+          </div>
+
+          <div class="form-group">
+            <label for="order-shoe-info">Thông tin giày (Brand/Model) / Ghi chú</label>
+            <input type="text" id="order-shoe-info" class="form-control" placeholder="Ví dụ: Nike Air Force 1 size 42 (không bắt buộc)">
+          </div>
+
+          <!-- Services Selector checklist -->
+          <div class="form-group">
+            <label>Chọn dịch vụ *</label>
+            <div class="services-selector-container" id="form-services-selector">
+              <!-- JS dynamically generates checklist of services -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="order-notes">Ghi chú tình trạng / yêu cầu thêm</label>
+            <textarea id="order-notes" class="form-control" rows="3" placeholder="Ví dụ: Giày rách chỉ gót, ố vàng nặng..."></textarea>
+          </div>
+
+          <!-- Upload nhiều ảnh chụp giày -->
+          <div class="form-group">
+            <label>Ảnh chụp tình trạng giày khi nhận (Chọn nhiều ảnh) *</label>
+            <div class="image-upload-wrapper" onclick="document.getElementById('order-images-input').click()">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="currentColor"/></svg>
+              <p>Nhấp vào đây để chọn ảnh hoặc chụp ảnh giày</p>
+              <span style="font-size: 0.8rem; color: var(--text-light);">(Hỗ trợ chụp từ camera hoặc chọn nhiều file ảnh)</span>
+            </div>
+            <input type="file" id="order-images-input" multiple accept="image/*" style="display: none;" onchange="handleOrderImagesSelect(event)">
+            
+            <!-- Upload progress bar (hidden by default) -->
+            <div id="upload-progress-container" class="upload-progress-bar-container" style="display: none;">
+              <div class="upload-progress-bar-label">Đang tải ảnh lên... <span id="upload-progress-text">0%</span></div>
+              <div class="upload-progress-bar-track">
+                <div id="upload-progress-fill" class="upload-progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Preview grid -->
+            <div class="image-preview-grid" id="order-images-preview-container">
+              <!-- JS will render previews here -->
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="order-total-price">Tổng giá trị (VNĐ) *</label>
+              <input type="number" id="order-total-price" class="form-control" required style="font-weight: 700; color: var(--color-brand-gold);">
+            </div>
+            
+            <div class="form-group" id="status-form-group" style="margin-bottom: 0; display: none;">
+              <label for="order-status">Trạng thái</label>
+              <select id="order-status" class="form-control">
+                <option value="pending">Chờ xử lý</option>
+                <option value="processing">Đang xử lý</option>
+                <option value="completed">Đã hoàn thành</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="delivered">Đã giao</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu Đơn Hàng</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE / EDIT EXPENSE ================= -->
+  <div class="modal-overlay" id="expense-modal">
+    <div class="modal-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3 id="expense-modal-title">Thêm Khoản Chi Mới</h3>
+        <button class="close-modal-btn" onclick="closeExpenseModal()">&times;</button>
+      </div>
+      <form id="expense-form" onsubmit="handleExpenseSubmit(event)">
+        <input type="hidden" id="exp-id">
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="exp-date">Ngày phát sinh chi *</label>
+              <input type="date" id="exp-date" class="form-control" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="exp-category">Danh mục chi phí *</label>
+              <select id="exp-category" class="form-control" required>
+                <option value="rent">🏢 Mặt bằng / Cửa hàng</option>
+                <option value="salaries">👥 Lương nhân viên & Phụ cấp</option>
+                <option value="supplies">🧼 Dung dịch, Hóa chất & Vật tư Spa</option>
+                <option value="utilities">⚡ Điện, Nước & Internet</option>
+                <option value="marketing">📢 Quảng cáo & Marketing</option>
+                <option value="other">📦 Chi phí khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="exp-amount">Số tiền chi (VND) *</label>
+            <input type="number" id="exp-amount" class="form-control" required placeholder="Ví dụ: 1500000" min="1000" step="1000">
+          </div>
+
+          <div class="form-group">
+            <label for="exp-description">Ghi chú nội dung / Lý do chi *</label>
+            <textarea id="exp-description" class="form-control" rows="3" required placeholder="Ví dụ: Thanh toán tiền điện cửa hàng tháng 7/2026"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeExpenseModal()">Hủy</button>
+          <button type="submit" id="expense-submit-btn" class="btn btn-primary">Lưu khoản chi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ORDER DETAIL & RECEIPT VIEW ================= -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Chi Tiết Đơn Hàng <span id="det-order-id"></span></h3>
+        <button class="close-modal-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="order-detail-grid">
+          <div>
+            <div class="detail-section-title">Thông tin khách hàng</div>
+            <div class="detail-row">
+              <span class="detail-label">Tên khách hàng:</span>
+              <span class="detail-value" id="det-cust-name"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Số điện thoại:</span>
+              <span class="detail-value" id="det-cust-phone"></span>
+            </div>
+            
+            <div class="detail-section-title" style="margin-top: 20px;">Chi tiết giày</div>
+            <div class="detail-row">
+              <span class="detail-label">Model/Hiệu:</span>
+              <span class="detail-value" id="det-shoe-info"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Ngày nhận đơn:</span>
+              <span class="detail-value" id="det-received-date"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Ngày hoàn thành:</span>
+              <span class="detail-value" id="det-completed-date"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Nhân viên nhận:</span>
+              <span class="detail-value" id="det-staff"></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Trạng thái:</span>
+              <span id="det-status"></span>
+            </div>
+          </div>
+          
+          <div>
+            <div class="detail-section-title">Dịch vụ đã chọn</div>
+            <ul class="receipt-service-list" id="det-services-list">
+              <!-- Services list items generated by JS -->
+            </ul>
+            <div class="detail-row" style="margin-top: 12px; font-size: 1.1rem; border-top: 1px solid var(--border-color); padding-top: 10px;">
+              <span class="detail-label" style="font-weight: 700; color: var(--color-brand-brown-dark);">Tổng thanh toán:</span>
+              <span class="detail-value price" id="det-total-price">0đ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gallery ảnh giày nhận -->
+        <div class="detail-gallery-section" id="det-gallery-section" style="margin-top: 24px;">
+          <div class="detail-section-title">Ảnh chụp tình trạng giày khi nhận</div>
+          <div class="detail-image-gallery" id="det-images-gallery">
+            <!-- JS will render images here -->
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; background-color: var(--color-brand-cream); padding: 12px; border-radius: var(--radius-sm); font-size: 0.9rem;">
+          <div style="font-weight: 700; color: var(--color-brand-brown-dark); margin-bottom: 4px;">Ghi chú / Tình trạng giày khi nhận:</div>
+          <div id="det-notes" style="color: var(--text-secondary); font-style: italic;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDetailModal()">Đóng</button>
+        <button class="btn btn-secondary" onclick="copyTrackingLink(state.currentEditingOrder ? state.currentEditingOrder.id : '')" title="Sao chép link tra cứu đơn hàng">
+          <svg style="width: 18px; height: 18px; fill: var(--color-brand-gold);" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Sao chép link tra cứu
+        </button>
+        <button class="btn btn-primary" style="background-color: var(--color-brand-gold); border-color: var(--color-brand-gold);" onclick="createContentFromDetailModal()" title="Tạo bài viết & ảnh Fanpage từ đơn này">
+          ✨ Tạo Content Fanpage
+        </button>
+        <button class="btn btn-success" id="btn-detail-pay" style="display: none;" onclick="quickPayOrder()">
+          <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.68v-1.92c-1.94-.28-3.57-1.49-3.73-3.48h2.09c.12.96.99 1.54 1.64 1.54.91 0 1.62-.51 1.62-1.39 0-1-.61-1.36-2.09-1.84-1.98-.64-3.58-1.47-3.58-3.69 0-1.82 1.39-3.13 3.32-3.44V4h2.68v1.9c1.62.24 3.01 1.34 3.26 3.19h-2.06c-.22-.84-.81-1.33-1.55-1.33-.86 0-1.42.49-1.42 1.15 0 .84.58 1.19 1.99 1.69 2.11.75 3.68 1.56 3.68 3.82 0 1.91-1.41 3.23-3.67 3.51z" fill="currentColor"/></svg>
+          Thanh toán
+        </button>
+        <button class="btn btn-primary" onclick="printReceipt()">
+          <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" fill="#FFF"/></svg>
+          In biên nhận
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE / EDIT SERVICE ================= -->
+  <div class="modal-overlay" id="service-modal">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="service-modal-title">Thêm Dịch Vụ Mới</h3>
+        <button class="close-modal-btn" onclick="closeServiceModal()">&times;</button>
+      </div>
+      <form id="service-form" onsubmit="handleServiceSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="service-name">Tên dịch vụ *</label>
+            <input type="text" id="service-name" class="form-control" required placeholder="Ví dụ: Vệ sinh giày boot da lộn">
+          </div>
+
+          <div class="form-group">
+            <label for="service-category">Danh mục nhóm *</label>
+            <select id="service-category" class="form-control" required>
+              <option value="Vệ sinh giày">Vệ sinh giày</option>
+              <option value="Thay đế giày">Thay đế giày</option>
+              <option value="Tẩy ố">Tẩy ố</option>
+              <option value="Repaint">Repaint</option>
+              <option value="Dán đế giày">Dán đế giày</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="service-price">Giá dịch vụ chuẩn (VNĐ) *</label>
+            <input type="number" id="service-price" class="form-control" required placeholder="Ví dụ: 90000">
+          </div>
+
+          <div class="form-group">
+            <label for="service-range">Mô tả khoảng giá (Tùy chọn)</label>
+            <input type="text" id="service-range" class="form-control" placeholder="Ví dụ: 90.000 - 120.000đ (để trống sẽ tự lấy giá chuẩn)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeServiceModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu dịch vụ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE EMPLOYEE ================= -->
+  <div class="modal-overlay" id="employee-modal">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="employee-modal-title">Thêm Tài Khoản Nhân Viên Mới</h3>
+        <button class="close-modal-btn" onclick="closeEmployeeModal()">&times;</button>
+      </div>
+      <form id="employee-form" onsubmit="handleEmployeeSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="emp-name">Họ và tên nhân viên *</label>
+            <input type="text" id="emp-name" class="form-control" required placeholder="Ví dụ: Nguyễn Văn B">
+          </div>
+          
+          <div class="form-group">
+            <label for="emp-email">Email đăng nhập *</label>
+            <input type="email" id="emp-email" class="form-control" required placeholder="Ví dụ: nguyenvanb@phuibui.vn">
+          </div>
+
+          <div class="form-group">
+            <label for="emp-password">Mật khẩu ban đầu *</label>
+            <input type="password" id="emp-password" class="form-control" required placeholder="••••••••">
+          </div>
+
+          <div class="form-group">
+            <label for="emp-role">Vai trò quyền hạn *</label>
+            <select id="emp-role" class="form-control" required>
+              <option value="staff">Nhân viên kỹ thuật / nhận đơn (Staff)</option>
+              <option value="admin">Quản lý cửa hàng (Admin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">Hủy</button>
+          <button type="submit" id="employee-submit-btn" class="btn btn-primary">Tạo tài khoản</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CUSTOMER DETAIL & HISTORY ================= -->
+  <div class="modal-overlay" id="customer-detail-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Chi Tiết Khách Hàng</h3>
+        <button class="close-modal-btn" onclick="closeCustomerDetailModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; background-color: var(--color-brand-cream); padding: 16px; border-radius: var(--radius-sm);">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Khách hàng</div>
+            <div id="cust-det-name" style="font-size: 1.2rem; font-weight: 700; color: var(--color-brand-brown-dark);"></div>
+          </div>
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Số điện thoại</div>
+            <div id="cust-det-phone" style="font-size: 1.2rem; font-weight: 700; color: var(--color-brand-brown-dark);"></div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+          <div class="stat-card" style="padding: 16px; border-left: 4px solid var(--color-brand-gold);">
+            <div class="stat-info">
+              <h3>Tổng số đơn</h3>
+              <div class="stat-value" id="cust-det-orders-count" style="font-size: 1.5rem;">0</div>
+            </div>
+          </div>
+          <div class="stat-card" style="padding: 16px; border-left: 4px solid var(--color-brand-brown-dark);">
+            <div class="stat-info">
+              <h3>Tổng chi tiêu</h3>
+              <div class="stat-value" id="cust-det-spent" style="font-size: 1.5rem; color: var(--color-brand-gold);">0đ</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section-title">Lịch sử đơn hàng</div>
+        <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+          <table class="custom-table" style="font-size: 0.9rem;">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Thông tin giày</th>
+                <th>Tổng tiền</th>
+                <th>Ngày nhận</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="cust-det-orders-table-body">
+              <!-- JS will load -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCustomerDetailModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= INVOICE THERMAL RECEIPT PRINT AREA (HIDDEN) ================= -->
+  <div id="receipt-print-area">
+    <div class="receipt-header">
+      <div id="print-brand-logo-container" style="display: none; margin-bottom: 8px; text-align: center;">
+        <img id="print-brand-logo-img" src="" alt="Logo" style="max-height: 50px; max-width: 100%; object-fit: contain;">
+      </div>
+      <h1 id="print-brand-name">SPA GIÀY</h1>
+      <p id="print-brand-subtitle">Hệ thống Quản lý cửa hàng Spa giày chuyên nghiệp</p>
+      <p>Địa chỉ: <span id="print-brand-address">N07C - LK19, Vạn Phúc, Hà Đông, Hà Nội</span></p>
+      <p>Hotline: <span id="print-brand-hotline">0906 22 7512</span></p>
+    </div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div>
+      <p><b>Mã hóa đơn:</b> <span id="print-receipt-id"></span></p>
+      <p><b>Ngày in:</b> <span id="print-date"></span></p>
+      <p><b>Khách hàng:</b> <span id="print-cust-name"></span></p>
+      <p><b>Số điện thoại:</b> <span id="print-cust-phone"></span></p>
+      <p><b>Thông tin giày:</b> <span id="print-shoe-info"></span></p>
+    </div>
+    
+    <div class="receipt-divider"></div>
+    
+    <table class="receipt-table">
+      <thead>
+        <tr>
+          <th>Tên dịch vụ</th>
+          <th style="text-align: right;">Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody id="print-services-body">
+        <!-- Dynamically rendered by print detail action -->
+      </tbody>
+    </table>
+    
+    <div class="receipt-divider"></div>
+    
+    <div style="text-align: right; font-size: 14px; font-weight: bold;">
+      Tổng cộng: <span id="print-total-price">0đ</span>
+    </div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div>
+      <p><b>Ghi chú nhận giày:</b> <span id="print-notes"></span></p>
+    </div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div id="print-receipt-note" style="text-align: center; margin-top: 15px; font-size: 10px; white-space: pre-line;">
+      <p>Cảm ơn quý khách đã tin tưởng dịch vụ của chúng tôi!</p>
+      <p>Quý khách vui lòng mang hóa đơn này khi nhận lại giày.</p>
+    </div>
+  </div>
+
+  <!-- ================= FIREBASE DATABASE INTEGRATION ================= -->
+  <!-- Firebase App, Firestore & Storage SDKs (Compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <script>
+    // Paste your Firebase Config here to sync data to the Cloud!
+    // If left as empty or placeholder, the app will automatically fall back to LocalStorage.
+    const firebaseConfig = {
+      apiKey: "AIzaSyB3FaJCdHHjOmxr3_acQqSQVrT3cFggkcA",
+      authDomain: "shoespaapp.firebaseapp.com",
+      projectId: "shoespaapp",
+      storageBucket: "shoespaapp.firebasestorage.app",
+      messagingSenderId: "173861203685",
+      appId: "1:173861203685:web:43d4394584ea3f30076e0c"
+    };
+
+    // Initialize Firebase if config is replaced
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "PLACEHOLDER_API_KEY") {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.firestore();
+        // window.storage = firebase.storage();
+        console.log("Firebase Firestore initialized successfully (Base64 Mode active)!");
+      } catch (error) {
+        console.error("Firebase initialization failed:", error);
+      }
+    } else {
+      console.log("Firebase Config not configured. Using LocalStorage fallback.");
+    }
+  </script>
+
+  <!-- ================= PUBLIC TRACKING VIEW ================= -->
+  <div id="view-public-tracking" class="view-section public-tracking-container" style="display: none;">
+    <div class="tracking-card">
+      <div class="tracking-header">
+        <div class="brand-logo">
+          <div id="track-brand-logo-container" style="display: none; margin-bottom: 8px;">
+            <img id="track-brand-logo-img" src="" alt="Logo" style="max-height: 48px; max-width: 100%; object-fit: contain;">
+          </div>
+          <h1 id="track-brand-name">SPA GIÀY</h1>
+          <p id="track-brand-subtitle">SHOE SPA & REPAIR</p>
+        </div>
+        <div class="tracking-title-block">
+          <h2>TRA CỨU TIẾN ĐỘ ĐƠN HÀNG</h2>
+          <p>Mã đơn hàng: <span id="track-order-id" style="font-weight: 700; color: var(--color-brand-gold);"></span></p>
+        </div>
+      </div>
+      
+      <!-- Stepper timeline horizontal -->
+      <div class="tracking-stepper-container">
+        <div class="stepper-wrapper">
+          <div class="step-node" id="step-pending">
+            <div class="step-circle">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" fill="currentColor"/></svg>
+            </div>
+            <div class="step-label">Nhận đơn</div>
+          </div>
+          <div class="step-line" id="line-1"></div>
+          <div class="step-node" id="step-processing">
+            <div class="step-circle">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/></svg>
+            </div>
+            <div class="step-label">Đang làm</div>
+          </div>
+          <div class="step-line" id="line-2"></div>
+          <div class="step-node" id="step-completed">
+            <div class="step-circle">
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
+            </div>
+            <div class="step-label">Hoàn thành</div>
+          </div>
+          <div class="step-line" id="line-3"></div>
+          <div class="step-node" id="step-delivered">
+            <div class="step-circle">
+              <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3v12h2v3h12v-3h3V8zM6 17H5v-1h1v1zm0-3H5v-1h1v1zm10 3h-1v-1h1v1zm0-3h-1v-1h1v1zm1-4H8V5h9v5zm3 5h-1v-1h1v1z" fill="currentColor"/></svg>
+            </div>
+            <div class="step-label">Đã giao khách</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Warning banner if cancelled -->
+      <div id="track-cancelled-banner" class="cancelled-banner" style="display: none;">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" fill="currentColor"/></svg>
+        <div>Đơn hàng này đã bị hủy</div>
+      </div>
+      
+      <!-- Info Grid -->
+      <div class="tracking-details-grid">
+        <div class="tracking-info-card">
+          <h3 class="card-title">Thông tin khách hàng</h3>
+          <div class="info-row">
+            <span class="info-label">Tên khách hàng:</span>
+            <span class="info-value" id="track-cust-name">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Số điện thoại:</span>
+            <span class="info-value" id="track-cust-phone">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Hiệu/Model giày:</span>
+            <span class="info-value" id="track-shoe-info">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Ngày nhận:</span>
+            <span class="info-value" id="track-received-date">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Trạng thái:</span>
+            <span class="info-value"><span id="track-status-badge" class="badge badge-pending">Chờ xử lý</span></span>
+          </div>
+          <div class="info-note-box">
+            <strong>Ghi chú từ cửa hàng:</strong>
+            <p id="track-notes" class="info-note-text">Không có ghi chú.</p>
+          </div>
+        </div>
+        
+        <div class="tracking-info-card">
+          <h3 class="card-title">Chi tiết dịch vụ & Thanh toán</h3>
+          <ul class="tracking-service-list" id="track-services-list">
+            <!-- Dynamically loaded -->
+          </ul>
+          <div class="info-row total-row">
+            <span class="total-label">Tổng chi phí:</span>
+            <span class="total-value" id="track-total-price">0đ</span>
+          </div>
+          
+          <div class="shop-contact-box">
+            <h4 id="track-brand-contact-title">Cần hỗ trợ? Liên hệ SPA GIÀY:</h4>
+            <div class="contact-buttons">
+              <a href="tel:0906227512" id="track-brand-hotline-btn" class="contact-btn phone">
+                <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.045 15.045 0 01-6.59-6.59l2.2-2.2c.28-.28.36-.67.25-1.02A11.36 11.36 0 018.5 4c0-.55-.45-1-1-1H4.03C3.47 3 3 3.47 3 4.02 3 13.39 10.61 21 19.98 21c.54 0 1-.46 1-1.02V16.38c0-.56-.45-1-1-1z" fill="currentColor"/></svg>
+                <span id="track-brand-hotline-text">Hotline</span>
+              </a>
+              <a href="https://zalo.me/0906227512" id="track-brand-zalo-btn" target="_blank" class="contact-btn zalo">
+                💬 Zalo Shop
+              </a>
+            </div>
+            <p class="shop-address" id="track-brand-address">Địa chỉ: N07C - LK19, Vạn Phúc, Hà Đông, Hà Nội</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Image Gallery -->
+      <div class="tracking-info-card" style="margin-top: 24px; display: none;" id="track-gallery-card">
+        <h3 class="card-title">Hình ảnh tình trạng giày khi nhận</h3>
+        <div class="detail-image-gallery" id="track-images-gallery">
+          <!-- JS will render images here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="mockData.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Toggle application shell based on login state
+    const originalSwitchView = window.switchView;
+    window.switchView = function(viewId) {
+      const workspace = document.getElementById('app-workspace');
+      const loginView = document.getElementById('view-login');
+      const trackingView = document.getElementById('view-public-tracking');
+      
+      if (viewId === 'login') {
+        workspace.style.display = 'none';
+        loginView.style.display = 'flex';
+        if (trackingView) trackingView.style.display = 'none';
+      } else if (viewId === 'public-tracking') {
+        workspace.style.display = 'none';
+        loginView.style.display = 'none';
+        if (trackingView) trackingView.style.display = 'flex';
+      } else {
+        loginView.style.display = 'none';
+        if (trackingView) trackingView.style.display = 'none';
+        workspace.style.display = 'grid';
+      }
+      
+      originalSwitchView(viewId);
+    };
+  </script>
+
+  <!-- ================= LIGHTBOX OVERLAY ================= -->
+  <div class="lightbox-overlay" id="lightbox-modal" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+  </div>
+</body>
+</html>

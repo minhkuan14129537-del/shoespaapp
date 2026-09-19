@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shoespaapp - Nền Tảng Quản Lý & Kinh Doanh Cửa Hàng Spa Giày</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Landing Page Specific Custom Styling */
+    :root {
+      --landing-primary: #1e293b;
+      --landing-accent: #d97706;
+      --landing-accent-hover: #b45309;
+      --landing-bg-light: #f8fafc;
+      --landing-card-bg: #ffffff;
+      --landing-border: #e2e8f0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #334155;
+      background-color: var(--landing-bg-light);
+      line-height: 1.6;
+    }
+
+    /* Header & Navigation Bar */
+    .header-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--landing-border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-brand-logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #d97706, #78350f);
+      color: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.2rem;
+    }
+
+    .nav-brand-text h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--landing-primary);
+    }
+
+    .nav-brand-text p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-menu a:hover {
+      color: var(--landing-accent);
+    }
+
+    .btn-nav-login {
+      background-color: var(--landing-primary);
+      color: white !important;
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: all 0.2s !important;
+    }
+
+    .btn-nav-login:hover {
+      background-color: #0f172a;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: 80px 24px 60px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 1px solid #fde68a;
+    }
+
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: #64748b;
+      margin-bottom: 36px;
+      max-width: 750px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+      transition: all 0.2s;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(217, 119, 6, 0.45);
+    }
+
+    .btn-hero-secondary {
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s;
+    }
+
+    .btn-hero-secondary:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Container Sections */
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 70px 24px;
+    }
+
+    .section-header-text {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 50px;
+    }
+
+    .section-header-text h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+
+    .section-header-text p {
+      color: #64748b;
+      font-size: 1.05rem;
+    }
+
+    /* Feature Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid var(--landing-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+      border-color: #fde68a;
+    }
+
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      background: #fef3c7;
+      color: #d97706;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    /* Pricing Section */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 14px;
+      border: 1px solid var(--landing-border);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+
+    .pricing-card.featured {
+      border: 2px solid #d97706;
+      box-shadow: 0 8px 24px rgba(217, 119, 6, 0.15);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #d97706;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 16px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pricing-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .pricing-price {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #d97706;
+      margin-bottom: 16px;
+    }
+
+    .pricing-price span {
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .pricing-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 28px 0;
+    }
+
+    .pricing-features li {
+      padding: 8px 0;
+      color: #475569;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-pricing {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 12px 0;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+
+    .btn-pricing-primary {
+      background: #d97706;
+      color: white;
+    }
+
+    .btn-pricing-primary:hover {
+      background: #b45309;
+    }
+
+    .btn-pricing-secondary {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-pricing-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* Workflow Steps */
+    .workflow-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    .step-card {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--landing-border);
+      text-align: center;
+    }
+
+    .step-number {
+      width: 44px;
+      height: 44px;
+      background: #1e293b;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin: 0 auto 16px;
+    }
+
+    .step-card h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .step-card p {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    /* Contact Section */
+    .contact-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid var(--landing-border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    .contact-info {
+      background: #0f172a;
+      color: white;
+      padding: 40px;
+    }
+
+    .contact-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .contact-form {
+      padding: 40px;
+    }
+
+    /* Footer */
+    footer {
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      padding: 30px 24px;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+      .hero-title {
+        font-size: 2rem;
+      }
+      .contact-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="header-nav">
+    <div class="nav-container">
+      <a href="landing.html" class="nav-brand">
+        <div class="nav-brand-logo">👟</div>
+        <div class="nav-brand-text">
+          <h1>Shoespaapp</h1>
+          <p>Nền tảng Quản lý Spa Giày</p>
+        </div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="#about">Giới thiệu</a></li>
+        <li><a href="#pricing">Các gói cước</a></li>
+        <li><a href="#guide">Hướng dẫn</a></li>
+        <li><a href="#contact">Liên hệ</a></li>
+        <li><a href="index.html" class="btn-nav-login">🔑 Đăng nhập Cửa hàng</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-badge">✨ Phần mềm Quản lý Cửa hàng Spa & Giặt Giày Đa Cửa Hàng</div>
+    <h1 class="hero-title">Giải Pháp Số Hóa Quản Lý & Kinh Doanh Cửa Hàng Spa Giày Chuyên Nghiệp</h1>
+    <p class="hero-subtitle">Nhận đơn hàng thông minh, in hóa đơn nhiệt bill 80mm, khách tự quét mã QR tra cứu tiến độ real-time, báo cáo doanh thu thu chi rành mạch & tạo bài viết Fanpage tự động.</p>
+    
+    <div class="hero-cta-group">
+      <a href="index.html?plan=trial&tab=register" class="btn-hero-primary">🔥 Đăng ký Dùng Thử 7 Ngày Miễn Phí</a>
+      <a href="index.html" class="btn-hero-secondary">🔑 Đăng Nhập Quản Lý Cửa Hàng</a>
+    </div>
+  </section>
+
+  <!-- SECTION 1: GIỚI THIỆU TÍNH NĂNG -->
+  <section id="about" class="section-container">
+    <div class="section-header-text">
+      <h2>Tính Năng Vượt Trội Cho Spa Giày</h2>
+      <p>Được thiết kế tối ưu hóa riêng cho các cửa hàng vệ sinh, giặt hấp, repaint & sửa chữa giày thể thao, giày da</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">👟</div>
+        <h3>Quản lý Đơn hàng & Ảnh nhận giày</h3>
+        <p>Tạo đơn hàng nhanh chóng, lưu ảnh chụp tình trạng vết bẩn/rách của giày khi nhận để tránh khiếu nại của khách.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🖨️</div>
+        <h3>In Hóa Đơn Nhiệt 80mm Chuẩn Spa</h3>
+        <p>In hóa đơn gửi khách kèm mã đơn, giá tiền và quy định giao nhận giày chuyên nghiệp chỉ với 1 cú nhấp.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Tra cứu Đơn hàng Real-time bằng QR</h3>
+        <p>Khách hàng quét mã QR trên phiếu in hoặc nhập số điện thoại để xem ảnh giày & trạng thái xử lý mà không cần gọi hỏi.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Báo cáo Doanh thu & Chi phí Chi tiết</h3>
+        <p>Thống kê doanh thu theo ngày/tháng/năm, tính tiền mặt bằng, tiền mua dung dịch hóa chất và lương nhân viên rành mạch.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>Marketing Studio & Nội dung Fanpage</h3>
+        <p>Tạo bài viết quảng cáo & ảnh ghép Before/After để đăng bài lên Facebook Fanpage tăng tương tác khách hàng.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🏢</div>
+        <h3>Độc lập Dữ liệu Đa Cửa Hàng (Multi-Tenant)</h3>
+        <p>Mỗi tài khoản cửa hàng đăng ký là một môi trường dữ liệu hoàn toàn riêng biệt, bảo mật thông tin tối đa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: CÁC GÓI CƯỚC DỊCH VỤ -->
+  <section id="pricing" style="background: white;" class="section-container">
+    <div class="section-header-text">
+      <h2>Các Gói Dịch Vụ Linh Hoạt</h2>
+      <p>Lựa chọn gói cước phù hợp nhất với quy mô cửa hàng của bạn. Không phát sinh chi phí ẩn.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- GÓI 1: DÙNG THỬ -->
+      <div class="pricing-card">
+        <div>
+          <div class="pricing-name">Gói Dùng Thử</div>
+          <div class="pricing-price">0đ <span>/ 7 ngày</span></div>
+          <ul class="pricing-features">
+            <li>✓ Full toàn bộ tính năng quản lý</li>
+            <li>✓ Không giới hạn số đơn hàng</li>
+            <li>✓ Hỗ trợ in bill hóa đơn nhiệt</li>
+            <li>✓ Trải nghiệm 7 ngày miễn phí</li>
+          </ul>
+        </div>
+        <a href="index.html?plan=trial&tab=register" class="btn-pricing btn-pricing-secondary">Đăng Ký Dùng Thử</a>
+      </div>
+
+      <!-- GÓI 2: TIÊU CHUẨN THÁNG -->
+      <div class="pricing-card">
+        <div>
+          <div class="pricing-name">Gói Tiêu Chuẩn</div>
+          <div class="pricing-price">199.000đ <span>/ tháng</span></div>
+          <ul class="pricing-features">
+            <li>✓ Quản lý 1 Cửa hàng Spa Giày</li>
+            <li>✓ Không giới hạn đơn & khách hàng</li>
+            <li>✓ In bill & Tra cứu QR tự động</li>
+            <li>✓ Thống kê báo cáo doanh thu & thu chi</li>
+          </ul>
+        </div>
+        <a href="index.html?plan=monthly&tab=register" class="btn-pricing btn-pricing-secondary">Đăng Ký Gói Tháng</a>
+      </div>
+
+      <!-- GÓI 3: CHUYÊN NGHIỆP NĂM (NỔI BẬT) -->
+      <div class="pricing-card featured">
+        <div class="featured-badge">🔥 KHUYÊN DÙNG (TIẾT KIỆM 17%)</div>
+        <div>
+          <div class="pricing-name">Gói Chuyên Nghiệp</div>
+          <div class="pricing-price">1.990.000đ <span>/ năm</span></div>
+          <ul class="pricing-features">
+            <li>✓ Toàn bộ tính năng Gói Tiêu Chuẩn</li>
+            <li>✓ <b>Tặng 2 tháng sử dụng miễn phí</b></li>
+            <li>✓ Tặng thiết kế mẫu In Bill logo thương hiệu</li>
+            <li>✓ Ưu tiên hỗ trợ kỹ thuật 24/7</li>
+          </ul>
+        </div>
+        <a href="index.html?plan=yearly&tab=register" class="btn-pricing btn-pricing-primary">Đăng Ký Gói 1 Năm</a>
+      </div>
+
+      <!-- GÓI 4: VIP VĨNH VIỄN -->
+      <div class="pricing-card">
+        <div>
+          <div class="pricing-name">Gói VIP Vĩnh Viễn</div>
+          <div class="pricing-price">4.990.000đ <span>/ trọn đời</span></div>
+          <ul class="pricing-features">
+            <li>✓ Sử dụng vĩnh viễn không giới hạn</li>
+            <li>✓ <b>Không tốn phí duy trì hàng năm</b></li>
+            <li>✓ Tùy chỉnh thương hiệu riêng biệt</li>
+            <li>✓ Hỗ trợ cập nhật tính năng mới trọn đời</li>
+          </ul>
+        </div>
+        <a href="index.html?plan=vip&tab=register" class="btn-pricing btn-pricing-secondary">Đăng Ký Gói VIP</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: HƯỚNG DẪN SỬ DỤNG -->
+  <section id="guide" class="section-container">
+    <div class="section-header-text">
+      <h2>Quy Trình 4 Bước Đơn Giản</h2>
+      <p>Bắt đầu quản lý cửa hàng Spa giày chuyên nghiệp chỉ trong 5 phút</p>
+    </div>
+
+    <div class="workflow-steps">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h4>Đăng ký Cửa Hàng</h4>
+        <p>Điền tên cửa hàng, số điện thoại và chọn gói dịch vụ mong muốn.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h4>Kích hoạt Tài khoản</h4>
+        <p>Admin hệ thống duyệt kích hoạt tài khoản nhanh chóng qua Hotline / Zalo.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h4>Nhận đơn & In Bill</h4>
+        <p>Nhập thông tin khách, chọn dịch vụ vệ sinh/repaint, chụp ảnh giày & in hóa đơn.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h4>Theo dõi Doanh thu</h4>
+        <p>Xem báo cáo doanh số, số đơn hoàn thành và lợi nhuận tự động hàng ngày.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: LIÊN HỆ -->
+  <section id="contact" class="section-container">
+    <div class="contact-card">
+      <div class="contact-info">
+        <h3>Liên Hệ Tư Vấn & Hỗ Trợ</h3>
+        <p style="color: #cbd5e1; margin-bottom: 30px;">Đội ngũ hỗ trợ Shoespaapp luôn sẵn sàng giải đáp mọi thắc mắc và kích hoạt gói cước cho cửa hàng của bạn 24/7.</p>
+        
+        <div class="contact-item">
+          <span style="font-size: 1.3rem;">📞</span>
+          <div>
+            <strong>Hotline / Zalo Tư Vấn:</strong><br>
+            <a href="https://zalo.me/0906227512" target="_blank" style="color: #fde68a; text-decoration: underline;">0906 22 7512</a>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <span style="font-size: 1.3rem;">🏢</span>
+          <div>
+            <strong>Văn Phòng Phát Triển:</strong><br>
+            N07C - LK19, Vạn Phúc, Hà Đông, Hà Nội
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <span style="font-size: 1.3rem;">✉️</span>
+          <div>
+            <strong>Email Hỗ Trợ:</strong><br>
+            support@shoespaapp.vn
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <h3 style="margin-top: 0; color: #0f172a;">Gửi Yêu Cầu Tư Vấn</h3>
+        <form onsubmit="alert('Cảm ơn bạn đã liên hệ! Đội ngũ tư vấn sẽ gọi lại trong 5 phút.'); return false;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Tên cửa hàng / Họ tên *</label>
+            <input type="text" class="form-control" required placeholder="Ví dụ: Sneaker Spa Hà Nội">
+          </div>
+
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Số điện thoại Zalo *</label>
+            <input type="tel" class="form-control" required placeholder="Ví dụ: 0901234567">
+          </div>
+
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 6px; font-weight: 600;">Nội dung cần hỗ trợ</label>
+            <textarea class="form-control" rows="3" placeholder="Ví dụ: Cần tư vấn gói Chuyên Nghiệp 1 năm..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full" style="height: 48px; background: #d97706; border-color: #d97706; font-weight: 700;">GỬI YÊU CẦU TƯ VẤN</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Bản quyền © 2026 Shoespaapp. Tất cả các quyền được bảo lưu.</p>
+    <p style="font-size: 0.8rem; color: #64748b; margin-top: 6px;">Phần mềm Quản lý Cửa hàng Spa Giày & Dịch vụ Vệ sinh Sửa chữa Giày chuyên nghiệp.</p>
+  </footer>
+
+</body>
+</html>
