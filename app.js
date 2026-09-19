@@ -71,7 +71,7 @@ function getStoreEmployees() {
   const sId = getCurrentStoreId();
   if (!sId) return [];
   if (state.currentUser && state.currentUser.role === 'superadmin') return state.users.filter(u => u.role !== 'superadmin');
-  return state.users.filter(u => u.storeId === sId && u.role === 'staff');
+  return state.users.filter(u => u.storeId === sId && (u.role === 'staff' || u.role === 'admin'));
 }
 
 function getStoreInfo() {
@@ -2064,21 +2064,23 @@ function deleteService(serviceId) {
 // 7. EMPLOYEE MANAGEMENT CRUD
 function renderEmployeesList() {
   const grid = document.getElementById('employees-grid');
+  if (!grid) return;
   grid.innerHTML = '';
 
   getStoreEmployees().forEach(u => {
     const card = document.createElement('div');
     card.className = 'employee-card';
+    const isAdmin = u.role === 'admin';
     card.innerHTML = `
-      <div class="employee-avatar">${u.name.split(' ').pop().substring(0, 2).toUpperCase()}</div>
+      <div class="employee-avatar" style="${isAdmin ? 'background: var(--color-brand-gold); color: #fff;' : ''}">${u.name ? u.name.split(' ').pop().substring(0, 2).toUpperCase() : 'NV'}</div>
       <div class="employee-details">
-        <div class="employee-name">${u.name}</div>
+        <div class="employee-name">${u.name || 'Chưa đặt tên'}</div>
         <div class="employee-email">${u.email}</div>
-        <span class="employee-role-badge">${u.role === 'admin' ? 'Quản trị' : 'Nhân viên'}</span>
+        <span class="employee-role-badge" style="${isAdmin ? 'background: #FEF3C7; color: #D97706; font-weight: 700;' : ''}">${isAdmin ? '👑 Chủ Cửa Hàng (Admin)' : 'Nhân viên'}</span>
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center;">
         <button class="btn btn-secondary btn-sm" onclick="openEmployeeModal('${u.id}')">Sửa</button>
-        ${u.id !== 'u-admin' ? `
+        ${!isAdmin && u.id !== 'u-admin' ? `
           <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${u.id}')">Xóa</button>
         ` : ''}
       </div>
@@ -2100,17 +2102,19 @@ function openEmployeeModal(userId = null) {
 
   if (userId) {
     state.currentEditingEmployee = state.users.find(u => u.id === userId);
+    if (!state.currentEditingEmployee) return;
+
     title.textContent = 'Chỉnh Sửa Tài Khoản';
     submitBtn.textContent = 'Lưu thay đổi';
     
     // Fill in form values
-    document.getElementById('emp-name').value = state.currentEditingEmployee.name;
-    document.getElementById('emp-email').value = state.currentEditingEmployee.email;
-    document.getElementById('emp-password').value = state.currentEditingEmployee.password;
-    roleSelect.value = state.currentEditingEmployee.role;
+    document.getElementById('emp-name').value = state.currentEditingEmployee.name || '';
+    document.getElementById('emp-email').value = state.currentEditingEmployee.email || '';
+    document.getElementById('emp-password').value = state.currentEditingEmployee.password || '';
+    roleSelect.value = state.currentEditingEmployee.role || 'staff';
 
     // Do not allow main admin to change their own role to prevent lockout
-    if (userId === 'u-admin') {
+    if (state.currentEditingEmployee.role === 'admin' || userId === 'u-admin') {
       roleSelect.disabled = true;
     }
   } else {
@@ -2122,8 +2126,10 @@ function openEmployeeModal(userId = null) {
 }
 
 function closeEmployeeModal() {
-  document.getElementById('emp-role').disabled = false;
-  document.getElementById('employee-modal').classList.remove('active');
+  const roleSelect = document.getElementById('emp-role');
+  if (roleSelect) roleSelect.disabled = false;
+  const modal = document.getElementById('employee-modal');
+  if (modal) modal.classList.remove('active');
 }
 
 function handleEmployeeSubmit(e) {
@@ -2137,19 +2143,21 @@ function handleEmployeeSubmit(e) {
 
   if (state.currentEditingEmployee) {
     // Editing
-    const isEmailTaken = state.users.some(u => u.email === email && u.id !== state.currentEditingEmployee.id);
+    const isEmailTaken = state.users.some(u => u.email.toLowerCase() === email.toLowerCase() && u.id !== state.currentEditingEmployee.id);
     if (isEmailTaken) {
       alert('Email này đã tồn tại trong hệ thống!');
       return;
     }
 
     const u = state.users.find(user => user.id === state.currentEditingEmployee.id);
+    if (!u) return;
+
     u.name = name;
     u.email = email;
     u.password = password;
     
-    // Only update role if it wasn't disabled (i.e. not main admin)
-    if (u.id !== 'u-admin') {
+    // Only update role if it wasn't admin
+    if (u.role !== 'admin' && u.id !== 'u-admin') {
       u.role = role;
     }
 
@@ -2164,7 +2172,7 @@ function handleEmployeeSubmit(e) {
     alert('Cập nhật tài khoản thành công!');
   } else {
     // Creating
-    if (state.users.some(u => u.email === email)) {
+    if (state.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
       alert('Email này đã tồn tại trong hệ thống!');
       return;
     }
@@ -2201,6 +2209,12 @@ function handleEmployeeSubmit(e) {
 }
 
 function deleteEmployee(userId) {
+  const target = state.users.find(u => u.id === userId);
+  if (target && target.role === 'admin') {
+    alert('Không thể xóa tài khoản Quản trị viên (Chủ cửa hàng)!');
+    return;
+  }
+
   if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
     state.users = state.users.filter(u => u.id !== userId);
     saveState('pb_v2_users', state.users);
