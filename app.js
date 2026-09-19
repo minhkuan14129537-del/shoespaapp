@@ -1605,7 +1605,7 @@ function populateServiceSelector(selectedServices = []) {
   const container = document.getElementById('form-services-selector');
   container.innerHTML = '';
 
-  state.services.forEach(s => {
+  getStoreServices().forEach(s => {
     const existingSelect = selectedServices.find(selected => selected.id === s.id);
     const isChecked = !!existingSelect;
     const quantity = existingSelect ? (existingSelect.quantity || 1) : 1;
@@ -3386,7 +3386,8 @@ function renderContentStudio() {
     orderSelect.innerHTML = '<option value="">-- Chọn một đơn hàng --</option>';
     
     // Sort orders newest first
-    const sortedOrders = [...state.orders].sort((a, b) => new Date(b.receivedDate) - new Date(a.receivedDate));
+    const storeOrders = getStoreOrders();
+    const sortedOrders = [...storeOrders].sort((a, b) => new Date(b.receivedDate) - new Date(a.receivedDate));
     sortedOrders.forEach(o => {
       const opt = document.createElement('option');
       opt.value = o.id;
@@ -3395,7 +3396,7 @@ function renderContentStudio() {
       orderSelect.appendChild(opt);
     });
 
-    if (studioState.selectedOrderId && state.orders.some(o => o.id === studioState.selectedOrderId)) {
+    if (studioState.selectedOrderId && storeOrders.some(o => o.id === studioState.selectedOrderId)) {
       orderSelect.value = studioState.selectedOrderId;
       onStudioOrderSelect(studioState.selectedOrderId);
     } else if (currentVal) {
@@ -4819,7 +4820,7 @@ function renderExpenses() {
   const yearFilter = document.getElementById('exp-filter-year') ? document.getElementById('exp-filter-year').value : 'all';
   const catFilter = document.getElementById('exp-filter-category') ? document.getElementById('exp-filter-category').value : 'all';
 
-  let filtered = state.expenses || [];
+  let filtered = getStoreExpenses();
 
   // Filter by date (month/year)
   filtered = filtered.filter(e => isDateMatch(e.date, null, monthFilter, yearFilter));
@@ -4896,7 +4897,7 @@ function openExpenseModal(expId = null) {
   const submitBtn = document.getElementById('expense-submit-btn');
 
   if (expId) {
-    const exp = (state.expenses || []).find(e => e.id === expId);
+    const exp = getStoreExpenses().find(e => e.id === expId);
     if (!exp) return;
     state.currentEditingExpense = exp;
     title.textContent = 'Chỉnh Sửa Khoản Chi';
