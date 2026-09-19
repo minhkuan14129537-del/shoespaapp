@@ -1502,7 +1502,7 @@ function populateServiceSelector(selectedServices = []) {
         <span class="service-select-name">${s.name}</span>
         <span class="service-select-cat">${s.category} (${s.priceRange})</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="service-controls-wrapper" style="display: flex; align-items: center; gap: 12px;">
         <div class="service-qty-control" onclick="event.stopPropagation()">
           <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">Đôi:</span>
           <input type="number" class="service-qty-input" value="${quantity}" min="1">
